@@ -153,7 +153,7 @@ struct ProgramView: View {
 
     private var daysList: some View {
         VStack(spacing: 12) {
-            SectionHeader(titleKey: "tab.today", icon: "list.bullet")
+            SectionHeader(titleKey: "program.days", icon: "list.bullet")
             ForEach(ProgramData.days(inWeek: selectedWeek)) { day in
                 dayRow(day)
             }
@@ -188,7 +188,7 @@ struct ProgramView: View {
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(theme.accent)
                         if isNext {
-                            ChipView(text: t("day.today"), filled: true)
+                            ChipView(text: t("session.next"), filled: true)
                         }
                     }
                     Text(t(day.titleKey))

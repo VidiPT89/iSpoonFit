@@ -51,7 +51,12 @@ struct ExerciseLibraryView: View {
             let matchesCategory = category == nil || exercise.category == category
             guard matchesCategory else { return false }
             guard !query.isEmpty else { return true }
-            return t(exercise.nameKey).localizedCaseInsensitiveContains(query)
+            // "gemeos" should still find "Elevação de gémeos".
+            return t(exercise.nameKey).range(
+                of: query,
+                options: [.caseInsensitive, .diacriticInsensitive],
+                locale: LocalizationManager.shared.current.locale
+            ) != nil
         }
     }
 

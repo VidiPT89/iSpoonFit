@@ -4,6 +4,7 @@ struct HistoryView: View {
     let viewModel: ProgramViewModel
 
     @Environment(\.dismiss) private var dismiss
+    @State private var pendingDeletion: CompletedSession?
     let theme = Theme.shared
 
     var body: some View {
@@ -35,6 +36,22 @@ struct HistoryView: View {
                     Button(t("action.close")) { dismiss() }
                         .tint(theme.accent)
                 }
+            }
+            .alert(
+                t("history.deleteTitle"),
+                isPresented: Binding(
+                    get: { pendingDeletion != nil },
+                    set: { if !$0 { pendingDeletion = nil } }
+                )
+            ) {
+                Button(t("action.cancel"), role: .cancel) {}
+                Button(t("action.delete"), role: .destructive) {
+                    if let session = pendingDeletion {
+                        withAnimation(theme.snappyAnimation) { viewModel.delete(session) }
+                    }
+                }
+            } message: {
+                Text(t("history.deleteBody"))
             }
         }
     }
@@ -84,7 +101,7 @@ struct HistoryView: View {
             Spacer(minLength: 0)
 
             Button {
-                withAnimation(theme.snappyAnimation) { viewModel.delete(session) }
+                pendingDeletion = session
             } label: {
                 Image(systemName: "trash")
                     .font(.caption)

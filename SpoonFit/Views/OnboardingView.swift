@@ -31,6 +31,13 @@ struct OnboardingView: View {
                 startPage.tag(3)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
+            // Swiping must not get past the safety page without the clearance
+            // confirmation, just like the Next button.
+            .onChange(of: page) { _, newValue in
+                if newValue > 1 && !clearance {
+                    withAnimation(theme.springAnimation) { page = 1 }
+                }
+            }
 
             pageDots
                 .padding(.vertical, 16)
@@ -58,9 +65,9 @@ struct OnboardingView: View {
                 .foregroundStyle(theme.textDim)
 
             HStack(spacing: 10) {
-                highlight("28", "tab.today")
-                highlight("20", "params.minutes", raw: "min")
-                highlight("4", "settings.reminders", raw: t("weekday.mon") + "–" + t("weekday.thu"))
+                highlight("28", t("onboarding.workouts"))
+                highlight("20", "min")
+                highlight("4", t("weekday.mon") + "–" + t("weekday.thu"))
             }
             .padding(.top, 6)
         }
@@ -169,12 +176,12 @@ struct OnboardingView: View {
         .scrollIndicators(.hidden)
     }
 
-    private func highlight(_ value: String, _ labelKey: String, raw: String? = nil) -> some View {
+    private func highlight(_ value: String, _ label: String) -> some View {
         VStack(spacing: 4) {
             Text(value)
                 .font(.title2.bold().monospacedDigit())
                 .foregroundStyle(theme.accentGradient)
-            Text(raw ?? t(labelKey))
+            Text(label)
                 .font(.caption2)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(theme.textDim)
@@ -232,7 +239,7 @@ struct OnboardingView: View {
                     withAnimation(theme.springAnimation) { page += 1 }
                 }
             } else {
-                GradientButton(titleKey: "onboarding.start", icon: "sparkles") {
+                GradientButton(titleKey: "onboarding.start", icon: "sparkles", isEnabled: clearance) {
                     Haptics.success()
                     viewModel.startProgram(
                         startDate: Calendar.current.startOfDay(for: startDate),

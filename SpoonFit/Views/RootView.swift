@@ -36,6 +36,9 @@ struct RootView: View {
             theme.systemIsDark = systemColorScheme == .dark
             viewModel.load(context: modelContext)
         }
+        .onChange(of: LocalizationManager.shared.current) { _, _ in
+            viewModel.refreshReminderLanguage()
+        }
         .onChange(of: systemColorScheme) { _, newValue in
             withAnimation(.easeInOut(duration: 0.3)) {
                 theme.systemIsDark = newValue == .dark

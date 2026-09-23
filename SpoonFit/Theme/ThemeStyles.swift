@@ -28,13 +28,6 @@ extension View {
     func panelBackground(elevated: Bool = false, highlighted: Bool = false) -> some View {
         modifier(PanelBackground(elevated: elevated, highlighted: highlighted))
     }
-
-    /// Applies a transform only when Reduce Motion is off, so motion-heavy
-    /// effects can be dropped without duplicating the whole view.
-    @ViewBuilder
-    func ifMotionAllowed<T: View>(_ reduceMotion: Bool, transform: (Self) -> T) -> some View {
-        if reduceMotion { self } else { transform(self) }
-    }
 }
 
 /// Shrinks slightly while held, which makes large tap targets feel physical.

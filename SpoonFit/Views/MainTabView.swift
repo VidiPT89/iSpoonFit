@@ -36,7 +36,10 @@ struct MainTabView: View {
         VStack(spacing: 0) {
             ZStack {
                 switch selection {
-                case .today: TodayView(viewModel: viewModel)
+                case .today:
+                    TodayView(viewModel: viewModel) {
+                        withAnimation(theme.snappyAnimation) { selection = .program }
+                    }
                 case .program: ProgramView(viewModel: viewModel)
                 case .exercises: ExerciseLibraryView()
                 case .settings: SettingsView(viewModel: viewModel)

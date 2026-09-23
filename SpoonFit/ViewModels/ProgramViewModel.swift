@@ -60,22 +60,29 @@ final class ProgramViewModel {
         try? context.save()
         refresh()
         if let reminderTime {
-            Task { await ReminderManager.schedule(at: reminderTime) }
+            Task { await updateReminder(enabled: true, time: reminderTime) }
         }
     }
 
-    func updateReminder(enabled: Bool, time: Date) {
-        guard let state, let context else { return }
-        state.reminderEnabled = enabled
+    /// Saves the reminder preference and schedules or cancels the
+    /// notifications. Returns false when iOS refused permission, in which case
+    /// the preference is stored as off.
+    @discardableResult
+    func updateReminder(enabled: Bool, time: Date) async -> Bool {
+        let granted = enabled ? await ReminderManager.schedule(at: time) : true
+        if !enabled { ReminderManager.cancelAll() }
+        guard let state, let context else { return granted }
+        state.reminderEnabled = enabled && granted
         state.reminderTime = time
         try? context.save()
-        Task {
-            if enabled {
-                await ReminderManager.schedule(at: time)
-            } else {
-                ReminderManager.cancelAll()
-            }
-        }
+        return granted
+    }
+
+    /// Reminder text is fixed when it is scheduled, so a language change
+    /// reschedules it in the new language.
+    func refreshReminderLanguage() {
+        guard let state, state.reminderEnabled, let time = state.reminderTime else { return }
+        Task { await ReminderManager.schedule(at: time) }
     }
 
     func updateStartDate(_ date: Date) {
@@ -128,6 +135,19 @@ final class ProgramViewModel {
     }
 
     // MARK: - Calendar
+
+    /// Whole days left before the chosen start date; zero once it has come.
+    var daysUntilStart: Int {
+        guard let start = state?.startDate else { return 0 }
+        let today = calendar.startOfDay(for: Date())
+        let days = calendar.dateComponents([.day], from: today, to: calendar.startOfDay(for: start)).day ?? 0
+        return max(0, days)
+    }
+
+    /// One workout a day is the plan; after that Today suggests resting.
+    var hasTrainedToday: Bool {
+        sessions.contains { calendar.isDateInToday($0.date) }
+    }
 
     /// Friday, Saturday and Sunday are rest days.
     var isRestDayToday: Bool {

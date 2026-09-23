@@ -19,6 +19,7 @@ final class SessionPlayerViewModel {
     private var stepEndDate: Date?
     private var ticker: Task<Void, Never>?
     private var startedAt = Date()
+    private var finishedAt: Date?
     private var pausedAt: Date?
     private var pausedTotal: TimeInterval = 0
     private var announcedSwitchSide = false
@@ -35,11 +36,6 @@ final class SessionPlayerViewModel {
 
     var currentStep: SessionStep {
         steps[min(index, steps.count - 1)]
-    }
-
-    var nextStep: SessionStep? {
-        let next = index + 1
-        return next < steps.count ? steps[next] : nil
     }
 
     /// The exercise the user should be looking at: on a rest or get-ready step
@@ -78,7 +74,6 @@ final class SessionPlayerViewModel {
     // MARK: - Lifecycle
 
     func start() {
-        SessionAudio.shared.activate()
         startedAt = Date()
         pausedTotal = 0
         beginStep()
@@ -101,13 +96,20 @@ final class SessionPlayerViewModel {
         }
     }
 
-    private func beginStep() {
+    /// Starts the current step. `anchor` is when it began: now for a manual
+    /// skip, or the previous step's end when the clock rolls over, so time
+    /// spent suspended is carried into the steps that should have run.
+    private func beginStep(from anchor: Date = Date()) {
         let step = currentStep
-        remaining = step.seconds
-        stepEndDate = Date().addingTimeInterval(TimeInterval(step.seconds))
-        announcedSwitchSide = false
+        let end = anchor.addingTimeInterval(TimeInterval(step.seconds))
+        stepEndDate = end
+        remaining = max(0, Int(end.timeIntervalSinceNow.rounded(.up)))
+        announcedSwitchSide = remaining <= (step.switchSideAtSecond ?? -1)
         showsSwitchSideBanner = false
-        announceStepStart(step)
+        // Steps that already ran out while the app was suspended stay silent.
+        if end.timeIntervalSinceNow > 0 {
+            announceStepStart(step)
+        }
     }
 
     private func announceStepStart(_ step: SessionStep) {
@@ -130,18 +132,19 @@ final class SessionPlayerViewModel {
     // MARK: - Ticking
 
     private func tick() {
-        guard !isPaused, !isFinished, let end = stepEndDate else { return }
-        let secondsLeft = end.timeIntervalSinceNow
-        let newRemaining = max(0, Int(secondsLeft.rounded(.up)))
+        guard !isPaused, !isFinished else { return }
 
+        // After the app was suspended several steps may have run out at once.
+        while !isFinished, let end = stepEndDate, end.timeIntervalSinceNow <= 0 {
+            advance(from: end)
+        }
+        guard !isFinished, let end = stepEndDate else { return }
+
+        let newRemaining = max(0, Int(end.timeIntervalSinceNow.rounded(.up)))
         if newRemaining != remaining {
             remaining = newRemaining
             handleCountdown(newRemaining)
             handleSwitchSide(newRemaining)
-        }
-
-        if secondsLeft <= 0 {
-            advance()
         }
     }
 
@@ -176,12 +179,12 @@ final class SessionPlayerViewModel {
 
     // MARK: - Navigation
 
-    private func advance() {
+    private func advance(from anchor: Date = Date()) {
         if index + 1 < steps.count {
             index += 1
-            beginStep()
+            beginStep(from: anchor)
         } else {
-            finish()
+            finish(at: anchor)
         }
     }
 
@@ -218,28 +221,34 @@ final class SessionPlayerViewModel {
         togglePause()
     }
 
-    /// Rebuilds the remaining session with the easier parameters and resumes
-    /// from the start of the current round.
+    /// Rebuilds the session with the easier parameters. In the circuit it
+    /// resumes from the start of the current round; in the warm-up and the
+    /// stretches, which do not change, it stays on the same exercise.
     func switchToLowEnergy() {
         guard !lowEnergy else { return }
-        let block = currentStep.block
-        let round = currentStep.round
+        let current = currentStep
+        let offsetInBlock = steps[..<index].filter { $0.block == current.block }.count
         lowEnergy = true
         steps = SessionBuilder.steps(for: day, lowEnergy: true)
 
-        let maxRounds = steps.map(\.totalRounds).max() ?? 1
-        let targetRound = min(round, maxRounds)
-        let target = steps.firstIndex {
-            $0.block == block && $0.round == targetRound && $0.isWork
-        } ?? 0
-        index = min(target, steps.count - 1)
+        let target: Int?
+        if current.block == .workout {
+            let maxRounds = steps.map(\.totalRounds).max() ?? 1
+            let round = min(current.round, maxRounds)
+            target = steps.firstIndex { $0.block == .workout && $0.round == round && $0.isWork }
+        } else {
+            let blockStart = steps.firstIndex { $0.block == current.block } ?? 0
+            target = blockStart + offsetInBlock
+        }
+        index = min(target ?? 0, steps.count - 1)
         if isPaused { togglePause() }
         beginStep()
     }
 
-    private func finish() {
+    private func finish(at date: Date = Date()) {
         guard !isFinished else { return }
         isFinished = true
+        finishedAt = date
         stepEndDate = nil
         ticker?.cancel()
         SessionAudio.shared.play(.finished)
@@ -248,8 +257,11 @@ final class SessionPlayerViewModel {
     }
 
     /// Wall-clock time spent in the session, ignoring time spent paused.
+    /// Frozen once the session finishes, so time spent on the check-in
+    /// screen is not counted.
     var completedDurationSeconds: Int {
-        let paused = pausedTotal + (pausedAt.map { Date().timeIntervalSince($0) } ?? 0)
-        return max(0, Int(Date().timeIntervalSince(startedAt) - paused))
+        let end = finishedAt ?? Date()
+        let paused = pausedTotal + (pausedAt.map { end.timeIntervalSince($0) } ?? 0)
+        return max(0, Int(end.timeIntervalSince(startedAt) - paused))
     }
 }

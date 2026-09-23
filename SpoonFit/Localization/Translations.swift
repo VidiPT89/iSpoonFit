@@ -53,12 +53,17 @@ enum Translations {
         "today.nextWorkout": [.pt: "Próximo treino", .en: "Next workout"],
         "today.nextInDays": [.pt: "Daqui a %d dias", .en: "In %d days"],
         "today.nextTomorrow": [.pt: "Amanhã", .en: "Tomorrow"],
-        "today.todaysWorkout": [.pt: "Treino de hoje", .en: "Today's workout"],
-        "today.focus": [.pt: "Foco", .en: "Focus"],
         "today.progress": [.pt: "O teu progresso", .en: "Your progress"],
         "today.daysDone": [.pt: "Dias concluídos", .en: "Days done"],
+        "today.doneTitle": [.pt: "Treino de hoje feito", .en: "Today's workout is done"],
+        "today.doneBody": [
+            .pt: "Descansa e bebe água. O próximo treino fica à tua espera.",
+            .en: "Rest and drink some water. Your next workout will be waiting for you."
+        ],
+        "today.startsSoon": [.pt: "Quase a começar", .en: "Almost time"],
+        "today.startsOn": [.pt: "O programa começa %@.", .en: "The program starts %@."],
+        "today.startNow": [.pt: "Começar já hoje", .en: "Start today instead"],
         "today.weeksDone": [.pt: "Semanas completas", .en: "Full weeks"],
-        "today.minutesTotal": [.pt: "Minutos de treino", .en: "Minutes trained"],
         "today.programComplete": [.pt: "Programa concluído!", .en: "Program complete!"],
         "today.programCompleteBody": [
             .pt: "Fizeste os 28 treinos. Podes repetir qualquer dia sempre que quiseres.",
@@ -103,6 +108,10 @@ enum Translations {
         "settings.haptics": [.pt: "Vibração", .en: "Haptics"],
         "settings.reminders": [.pt: "Lembretes", .en: "Reminders"],
         "settings.reminderTime": [.pt: "Hora do lembrete", .en: "Reminder time"],
+        "settings.remindersDenied": [
+            .pt: "As notificações estão desligadas para o SpoonFit. Ativa-as nas Definições do iPhone.",
+            .en: "Notifications are off for SpoonFit. Turn them on in the iPhone Settings app."
+        ],
         "settings.reminderDays": [.pt: "Nos dias de treino, de segunda a quinta.", .en: "On training days, Monday to Thursday."],
         "settings.startDate": [.pt: "Data de início", .en: "Start date"],
         "settings.restart": [.pt: "Reiniciar programa", .en: "Restart program"],
@@ -119,12 +128,10 @@ enum Translations {
 
         // MARK: Generic actions
         "action.cancel": [.pt: "Cancelar", .en: "Cancel"],
-        "action.confirm": [.pt: "Confirmar", .en: "Confirm"],
         "action.close": [.pt: "Fechar", .en: "Close"],
         "action.done": [.pt: "Concluir", .en: "Done"],
         "action.back": [.pt: "Voltar", .en: "Back"],
         "action.next": [.pt: "Seguinte", .en: "Next"],
-        "action.share": [.pt: "Partilhar", .en: "Share"],
         "action.understood": [.pt: "Percebi", .en: "Got it"],
         "action.delete": [.pt: "Apagar", .en: "Delete"],
 
@@ -150,6 +157,7 @@ enum Translations {
             .en: "The program runs Monday to Thursday. Pick the Monday you want to start on."
         ],
         "onboarding.reminderToggle": [.pt: "Lembrar-me de treinar", .en: "Remind me to train"],
+        "onboarding.workouts": [.pt: "treinos", .en: "workouts"],
         "onboarding.start": [.pt: "Começar", .en: "Get started"],
 
         // MARK: Materials

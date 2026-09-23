@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TodayView: View {
     let viewModel: ProgramViewModel
+    var onShowProgram: () -> Void = {}
 
     @State private var activeDay: ProgramDay?
     @State private var appeared = false
@@ -18,6 +19,10 @@ struct TodayView: View {
 
                 if viewModel.isProgramComplete {
                     completeCard
+                } else if viewModel.daysUntilStart > 0 {
+                    upcomingCard
+                } else if viewModel.hasTrainedToday {
+                    doneTodayCard
                 } else if viewModel.isRestDayToday {
                     restDayCard
                 } else if let day = viewModel.nextDay {
@@ -36,7 +41,12 @@ struct TodayView: View {
             withAnimation(theme.springAnimation.delay(0.05)) { appeared = true }
         }
         .fullScreenCover(item: $activeDay) { day in
-            SessionPlayerView(day: day, lowEnergy: viewModel.lowEnergyToday, viewModel: viewModel)
+            SessionPlayerView(
+                day: day,
+                lowEnergy: viewModel.lowEnergyToday,
+                viewModel: viewModel,
+                onViewProgram: onShowProgram
+            )
         }
     }
 
@@ -210,28 +220,106 @@ struct TodayView: View {
             }
 
             if let day = viewModel.nextDay {
-                Divider().overlay(theme.accent.opacity(0.12))
-                HStack {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(t("today.nextWorkout"))
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(theme.textFaint)
-                        Text(t(day.titleKey))
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(theme.text)
-                    }
-                    Spacer()
-                    ChipView(text: countdownLabel, icon: "calendar")
-                }
+                nextWorkoutRow(day, countdown: countdownLabel(viewModel.daysUntilNextTrainingDay))
             }
         }
         .padding(18)
         .panelBackground()
     }
 
-    private var countdownLabel: String {
-        let days = viewModel.daysUntilNextTrainingDay
-        return days <= 1 ? t("today.nextTomorrow") : t("today.nextInDays", days)
+    /// Shown once today's session is logged, so the app never nudges towards
+    /// a second workout on the same day.
+    private var doneTodayCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.title3)
+                    .foregroundStyle(theme.ok)
+                    .symbolRenderingMode(.hierarchical)
+                    .symbolEffect(.bounce, options: .nonRepeating, value: appeared)
+                Text(t("today.doneTitle"))
+                    .font(.title3.bold())
+                    .foregroundStyle(theme.text)
+                Spacer()
+            }
+
+            Text(t("today.doneBody"))
+                .font(.subheadline)
+                .foregroundStyle(theme.textDim)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let day = viewModel.nextDay {
+                nextWorkoutRow(day, countdown: nil)
+            }
+        }
+        .padding(18)
+        .panelBackground()
+    }
+
+    /// Before the chosen start date: a preview of Day 1 and the option to
+    /// bring the start forward to today.
+    private var upcomingCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                Image(systemName: "calendar.badge.clock")
+                    .font(.title3)
+                    .foregroundStyle(theme.accent)
+                    .symbolRenderingMode(.hierarchical)
+                Text(t("today.startsSoon"))
+                    .font(.title3.bold())
+                    .foregroundStyle(theme.text)
+                Spacer()
+                ChipView(text: countdownLabel(viewModel.daysUntilStart), icon: "calendar")
+            }
+
+            Text(t("today.startsOn", formattedStartDate))
+                .font(.subheadline)
+                .foregroundStyle(theme.textDim)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let day = viewModel.nextDay {
+                nextWorkoutRow(day, countdown: nil)
+            }
+
+            OutlineButton(titleKey: "today.startNow", icon: "play.fill") {
+                Haptics.selection()
+                withAnimation(theme.springAnimation) { viewModel.updateStartDate(Date()) }
+            }
+        }
+        .padding(18)
+        .panelBackground()
+    }
+
+    private func nextWorkoutRow(_ day: ProgramDay, countdown: String?) -> some View {
+        VStack(spacing: 14) {
+            Divider().overlay(theme.accent.opacity(0.12))
+            HStack {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("\(t("today.nextWorkout")) · \(t("day.n", day.index))")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(theme.textFaint)
+                    Text(t(day.titleKey))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(theme.text)
+                }
+                Spacer()
+                if let countdown {
+                    ChipView(text: countdown, icon: "calendar")
+                }
+            }
+        }
+    }
+
+    private func countdownLabel(_ days: Int) -> String {
+        days <= 1 ? t("today.nextTomorrow") : t("today.nextInDays", days)
+    }
+
+    private var formattedStartDate: String {
+        guard let start = viewModel.state?.startDate else { return "" }
+        let formatter = DateFormatter()
+        formatter.locale = LocalizationManager.shared.current.locale
+        formatter.setLocalizedDateFormatFromTemplate("EEEEdMMMM")
+        return formatter.string(from: start)
     }
 
     private func restSuggestion(_ icon: String, _ key: String) -> some View {

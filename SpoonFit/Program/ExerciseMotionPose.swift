@@ -69,10 +69,6 @@ func motionLerp(_ a: CGPoint, _ b: CGPoint, _ t: Double) -> CGPoint {
     CGPoint(x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t)
 }
 
-func motionMidpoint(_ a: CGPoint, _ b: CGPoint) -> CGPoint {
-    CGPoint(x: (a.x + b.x) / 2, y: (a.y + b.y) / 2)
-}
-
 // MARK: - Pose source
 
 enum ExerciseMotionPose {

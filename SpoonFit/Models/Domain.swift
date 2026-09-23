@@ -81,8 +81,6 @@ struct Exercise: Identifiable, Hashable {
     let isUnilateral: Bool
     let isAlternating: Bool
     let muscleKeys: [String]
-
-    var name: String { t(nameKey) }
 }
 
 /// An exercise as it appears on a specific day, with that day's modifiers.

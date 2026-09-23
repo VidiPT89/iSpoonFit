@@ -22,9 +22,12 @@ enum ReminderManager {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
     }
 
-    static func schedule(at time: Date, calendar: Calendar = .current) async {
+    /// Replaces any pending reminders. Returns false when the user has not
+    /// allowed notifications, so the caller can switch the setting back off.
+    @discardableResult
+    static func schedule(at time: Date, calendar: Calendar = .current) async -> Bool {
         cancelAll()
-        guard await requestAuthorization() else { return }
+        guard await requestAuthorization() else { return false }
 
         let components = calendar.dateComponents([.hour, .minute], from: time)
         let content = UNMutableNotificationContent()
@@ -46,5 +49,6 @@ enum ReminderManager {
             )
             try? await center.add(request)
         }
+        return true
     }
 }

@@ -8,13 +8,13 @@
 ## ✨ Features
 
 - ✅ A complete 28-session plan: seven weeks, four sessions per week, Monday to Thursday, across four phases of progression
-- ✅ 21 bodyweight exercises across legs, glutes, core, upper body and mobility, each with its own animated demonstration
+- ✅ 21 bodyweight exercises across warm-up, legs and glutes, core and stretching, each with its own animated demonstration
 - ✅ Stick-figure animations drawn live with `Canvas` and `TimelineView`: every movement is generated from code, no video and no image assets
 - ✅ Guided session player with a date-anchored timer that never drifts, even if the screen locks mid-set
-- ✅ Spoken countdown, interval sounds and haptics, with a "switch sides" cue halfway through every unilateral exercise
+- ✅ Spoken countdown, interval sounds and haptics, with a "switch sides" cue halfway through every unilateral exercise; your music keeps playing and only dips while the voice speaks
 - ✅ Low-energy mode: shorter work intervals, longer rests, one round fewer and no added load, decided per day
 - ✅ Water bottles as the only progression tool, introduced on the days where it matters
-- ✅ Progress tracking with a session history, weekly progress, total minutes and seven unlockable achievements
+- ✅ Progress tracking with a session history, weekly progress, total minutes and five unlockable achievements
 - ✅ Weekly reminders for the four training days, scheduled locally
 - ✅ Exercise library with step-by-step instructions, breathing cues, common mistakes and an easier version of every movement
 - ✅ Animated splash screen with developer credits, then straight into the app
@@ -65,7 +65,7 @@ Build and run (`⌘R`) on the simulator or a connected device.
 2. Open **Today** and start the session the programme has queued for you
 3. Follow the animated figure: it loops at the pace you should be moving at
 4. Rest screens preview the next exercise, so you always know what is coming
-5. Feeling flat? Tap **Low energy** before starting and the whole session adapts
+5. Feeling flat? Turn on **Low-energy day** before starting, or switch to it mid-session, and the whole workout adapts
 
 Days unlock in order and missing a day costs you nothing, the programme simply waits. Friday to Sunday are rest days by design.
 
@@ -89,7 +89,7 @@ xcodebuild -project SpoonFit.xcodeproj -scheme SpoonFit \
   -destination 'platform=iOS Simulator,name=iPhone 17' test
 ```
 
-58 tests cover the programme data, the session builder, the animation poses and the translations.
+63 tests cover the programme data, the session builder, the animation poses, the translations and the session and programme view models.
 
 ## 🔒 Privacy
 

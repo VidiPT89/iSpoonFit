@@ -8,12 +8,22 @@ struct SettingsView: View {
     @State private var soundsEnabled = SessionAudio.soundsEnabled
     @State private var voiceEnabled = SessionAudio.voiceEnabled
     @State private var hapticsEnabled = Haptics.isEnabled
-    @State private var reminderEnabled = false
-    @State private var reminderTime = Date()
-    @State private var startDate = Date()
+    @State private var reminderEnabled: Bool
+    @State private var reminderTime: Date
+    @State private var startDate: Date
+    @State private var remindersDenied = false
     @State private var showsSafety = false
     @State private var showsHistory = false
     @State private var showsRestartConfirmation = false
+
+    init(viewModel: ProgramViewModel) {
+        self.viewModel = viewModel
+        let state = viewModel.state
+        _reminderEnabled = State(initialValue: state?.reminderEnabled ?? false)
+        _reminderTime = State(initialValue: state?.reminderTime
+            ?? Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date())
+        _startDate = State(initialValue: state?.startDate ?? Date())
+    }
 
     var body: some View {
         NavigationStack {
@@ -36,7 +46,6 @@ struct SettingsView: View {
             .background(theme.background.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
         }
-        .onAppear(perform: loadState)
         .sheet(isPresented: $showsSafety) { SafetySheet() }
         .sheet(isPresented: $showsHistory) { HistoryView(viewModel: viewModel) }
         .alert(t("settings.restart"), isPresented: $showsRestartConfirmation) {
@@ -48,12 +57,6 @@ struct SettingsView: View {
         } message: {
             Text(t("settings.restartConfirm"))
         }
-    }
-
-    private func loadState() {
-        reminderEnabled = viewModel.state?.reminderEnabled ?? false
-        reminderTime = viewModel.state?.reminderTime ?? Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date()
-        startDate = viewModel.state?.startDate ?? Date()
     }
 
     // MARK: - Cards
@@ -139,23 +142,31 @@ struct SettingsView: View {
     private var remindersCard: some View {
         card(titleKey: "settings.reminders", icon: "bell.fill") {
             VStack(spacing: 10) {
-                toggleRow("settings.reminders", icon: "bell.badge.fill", isOn: $reminderEnabled)
-                    .onChange(of: reminderEnabled) { _, value in
-                        viewModel.updateReminder(enabled: value, time: reminderTime)
-                    }
+                toggleRow("settings.reminders", icon: "bell.badge.fill", isOn: reminderBinding)
+
+                if remindersDenied {
+                    Text(t("settings.remindersDenied"))
+                        .font(.caption)
+                        .foregroundStyle(theme.danger)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
 
                 if reminderEnabled {
                     DatePicker(
                         t("settings.reminderTime"),
-                        selection: $reminderTime,
+                        selection: Binding(
+                            get: { reminderTime },
+                            set: { value in
+                                reminderTime = value
+                                Task { await viewModel.updateReminder(enabled: true, time: value) }
+                            }
+                        ),
                         displayedComponents: .hourAndMinute
                     )
                     .font(.subheadline)
                     .foregroundStyle(theme.text)
                     .tint(theme.accent)
-                    .onChange(of: reminderTime) { _, value in
-                        viewModel.updateReminder(enabled: true, time: value)
-                    }
 
                     Text(t("settings.reminderDays"))
                         .font(.caption)
@@ -166,18 +177,44 @@ struct SettingsView: View {
         }
     }
 
+    /// Writes straight through to the view model, and flips back off with a
+    /// hint when iOS has notifications turned off for the app.
+    private var reminderBinding: Binding<Bool> {
+        Binding(
+            get: { reminderEnabled },
+            set: { value in
+                reminderEnabled = value
+                remindersDenied = false
+                Task {
+                    let granted = await viewModel.updateReminder(enabled: value, time: reminderTime)
+                    if value && !granted {
+                        withAnimation(theme.snappyAnimation) {
+                            reminderEnabled = false
+                            remindersDenied = true
+                        }
+                    }
+                }
+            }
+        )
+    }
+
     private var programCard: some View {
         card(titleKey: "settings.program", icon: "calendar") {
             VStack(spacing: 10) {
                 DatePicker(
                     t("settings.startDate"),
-                    selection: $startDate,
+                    selection: Binding(
+                        get: { startDate },
+                        set: { value in
+                            startDate = value
+                            viewModel.updateStartDate(value)
+                        }
+                    ),
                     displayedComponents: .date
                 )
                 .font(.subheadline)
                 .foregroundStyle(theme.text)
                 .tint(theme.accent)
-                .onChange(of: startDate) { _, value in viewModel.updateStartDate(value) }
 
                 actionRow("settings.history", icon: "clock.arrow.circlepath") { showsHistory = true }
                 actionRow("settings.safety", icon: "heart.text.square.fill") { showsSafety = true }

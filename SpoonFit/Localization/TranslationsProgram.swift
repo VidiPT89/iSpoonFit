@@ -14,12 +14,9 @@ extension Translations {
         "block.warmup": [.pt: "Aquecimento", .en: "Warm-up"],
         "block.workout": [.pt: "Treino", .en: "Workout"],
         "block.cooldown": [.pt: "Alongamentos", .en: "Stretching"],
-
-        "params.title": [.pt: "Parâmetros da semana", .en: "This week's parameters"],
         "params.work": [.pt: "Trabalho", .en: "Work"],
         "params.rest": [.pt: "Descanso", .en: "Rest"],
         "params.rounds": [.pt: "Voltas", .en: "Rounds"],
-        "params.seconds": [.pt: "%d s", .en: "%d s"],
         "params.minutes": [.pt: "%d min", .en: "%d min"],
 
         // MARK: Phases
@@ -55,8 +52,8 @@ extension Translations {
         "day.loadedStrength": [.pt: "Força com carga", .en: "Loaded strength"],
         "day.finalChallenge": [.pt: "Desafio final", .en: "Final challenge"],
 
+        "program.days": [.pt: "Dias", .en: "Days"],
         "day.locked": [.pt: "Conclui o dia anterior primeiro", .en: "Finish the previous day first"],
-        "day.today": [.pt: "Hoje", .en: "Today"],
         "day.completed": [.pt: "Concluído", .en: "Completed"],
 
         // MARK: Modifiers
@@ -134,7 +131,6 @@ extension Translations {
         "achievement.halfway": [.pt: "Meio caminho", .en: "Halfway there"],
         "achievement.firstLoad": [.pt: "Primeira carga", .en: "First load"],
         "achievement.finalChallenge": [.pt: "Desafio final", .en: "Final challenge"],
-        "badge.final": [.pt: "Desafio final concluído!", .en: "Final challenge complete!"],
 
         // MARK: History
         "history.title": [.pt: "Histórico", .en: "History"],
@@ -142,7 +138,11 @@ extension Translations {
             .pt: "Ainda não há treinos registados. O primeiro aparece aqui assim que o concluíres.",
             .en: "No workouts logged yet. The first one shows up here as soon as you finish it."
         ],
-        "history.normalMode": [.pt: "Normal", .en: "Normal"],
+        "history.deleteTitle": [.pt: "Apagar este treino?", .en: "Delete this workout?"],
+        "history.deleteBody": [
+            .pt: "Sai do histórico e do progresso. Não dá para desfazer.",
+            .en: "It is removed from your history and progress. This cannot be undone."
+        ],
         "history.energyLabel": [.pt: "Energia %d/5", .en: "Energy %d/5"],
         "history.discomfortLabel": [.pt: "Desconforto %d/10", .en: "Discomfort %d/10"],
 
@@ -152,7 +152,6 @@ extension Translations {
             .pt: "O teu treino de 20 minutos está à tua espera 🧡",
             .en: "Your 20-minute workout is waiting for you 🧡"
         ],
-        "share.dayTitle": [.pt: "Partilhar este dia", .en: "Share this day"],
         "share.weekTitle": [.pt: "Partilhar a semana", .en: "Share this week"],
         "share.footer": [.pt: "SpoonFit · ividi.dev", .en: "SpoonFit · ividi.dev"]
     ]

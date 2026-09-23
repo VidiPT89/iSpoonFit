@@ -91,7 +91,7 @@ struct DayDetailView: View {
             HStack(spacing: 8) {
                 ChipView(text: t("params.minutes", SessionBuilder.estimatedMinutes(for: day, lowEnergy: lowEnergy)), icon: "clock.fill")
                 ChipView(text: "\(params.work)s / \(params.rest)s", icon: "flame.fill")
-                ChipView(text: "\(params.rounds)× ", icon: "arrow.triangle.2.circlepath")
+                ChipView(text: "\(params.rounds)×", icon: "arrow.triangle.2.circlepath")
                 Spacer(minLength: 0)
             }
 

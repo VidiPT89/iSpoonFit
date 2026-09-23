@@ -17,7 +17,8 @@ final class ProgramState {
         self.medicalClearance = medicalClearance
     }
 
-    /// The Monday on or after `date`, which is where a program always starts.
+    /// The first Monday strictly after `date`: the default start, which always
+    /// leaves at least a day to get the mat and the chair ready.
     static func nextMonday(after date: Date = Date(), calendar: Calendar = .current) -> Date {
         let start = calendar.startOfDay(for: date)
         let weekday = calendar.component(.weekday, from: start)

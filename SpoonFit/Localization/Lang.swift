@@ -49,16 +49,8 @@ final class LocalizationManager {
         }
     }
 
-    func toggle() {
-        current = current == .pt ? .en : .pt
-    }
-
     func t(_ key: String) -> String {
         Translations.table[key]?[current] ?? key
-    }
-
-    func t(_ key: String, _ arguments: CVarArg...) -> String {
-        String(format: t(key), locale: current.locale, arguments: arguments)
     }
 }
 

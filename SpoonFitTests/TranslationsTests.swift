@@ -153,7 +153,7 @@ final class TranslationsTests: XCTestCase {
             "settings.language", "settings.appearance", "settings.sound",
             "settings.voice", "settings.haptics", "settings.reminders",
             "settings.restart", "settings.safety", "settings.about",
-            "onboarding.clearance", "onboarding.start", "badge.final",
+            "onboarding.clearance", "onboarding.start", "onboarding.workouts",
             "safety.point1", "safety.point6",
             "history.title", "history.empty", "reminder.title", "reminder.body",
             "action.cancel", "action.done", "action.close"

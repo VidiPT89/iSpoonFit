@@ -3,6 +3,8 @@ import SwiftUI
 struct SessionPlayerView: View {
     let day: ProgramDay
     let viewModel: ProgramViewModel
+    /// When set, the completion screen offers a shortcut to the Program tab.
+    let onViewProgram: (() -> Void)?
 
     @Environment(\.dismiss) private var dismiss
     @State private var player: SessionPlayerViewModel
@@ -11,9 +13,10 @@ struct SessionPlayerView: View {
 
     let theme = Theme.shared
 
-    init(day: ProgramDay, lowEnergy: Bool, viewModel: ProgramViewModel) {
+    init(day: ProgramDay, lowEnergy: Bool, viewModel: ProgramViewModel, onViewProgram: (() -> Void)? = nil) {
         self.day = day
         self.viewModel = viewModel
+        self.onViewProgram = onViewProgram
         _player = State(initialValue: SessionPlayerViewModel(day: day, lowEnergy: lowEnergy))
     }
 
@@ -25,8 +28,10 @@ struct SessionPlayerView: View {
                 SessionCompleteView(
                     day: day,
                     durationSeconds: player.completedDurationSeconds,
-                    lowEnergy: player.lowEnergy
-                ) { energy, discomfort, note in
+                    daysDone: viewModel.completedCount + (viewModel.isCompleted(day) ? 0 : 1),
+                    lowEnergy: player.lowEnergy,
+                    offersProgramLink: onViewProgram != nil
+                ) { energy, discomfort, note, showProgram in
                     viewModel.complete(
                         day: day,
                         durationSeconds: player.completedDurationSeconds,
@@ -36,6 +41,7 @@ struct SessionPlayerView: View {
                         note: note
                     )
                     dismiss()
+                    if showProgram { onViewProgram?() }
                 }
                 .transition(.opacity.combined(with: .scale(scale: 0.96)))
             } else {
@@ -240,12 +246,12 @@ struct SessionPlayerView: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 9)
                 .background(Capsule().fill(theme.panel2))
-            } else if let breathing = tIfPresent(player.displayedRef.catalogEntry.id.breathingKey) {
+            } else if let cue = workTip {
                 HStack(alignment: .top, spacing: 8) {
-                    Image(systemName: "wind")
+                    Image(systemName: cue.icon)
                         .font(.caption)
-                        .foregroundStyle(theme.accent)
-                    Text(breathing)
+                        .foregroundStyle(player.lowEnergy ? theme.ok : theme.accent)
+                    Text(cue.text)
                         .font(.caption)
                         .multilineTextAlignment(.leading)
                         .foregroundStyle(theme.textDim)
@@ -254,6 +260,16 @@ struct SessionPlayerView: View {
             }
         }
         .frame(minHeight: 44)
+    }
+
+    /// On a low-energy day the easier version replaces the breathing cue, so
+    /// the gentler option is always on screen without having to look it up.
+    private var workTip: (icon: String, text: String)? {
+        let id = player.displayedRef.catalogEntry.id
+        if player.lowEnergy, let easier = tIfPresent(id.easierKey) {
+            return ("leaf.fill", easier)
+        }
+        return tIfPresent(id.breathingKey).map { ("wind", $0) }
     }
 
     private var segments: some View {

@@ -141,15 +141,6 @@ final class Theme {
         )
     }
 
-    /// Angular variant used by the countdown ring so the sweep keeps its
-    /// brightness all the way around instead of fading at one end.
-    var accentAngularGradient: AngularGradient {
-        AngularGradient(
-            colors: [accentLight, accent, accentDark, accentLight],
-            center: .center
-        )
-    }
-
     /// Text color that sits on top of `accentGradient`. Black on both
     /// appearances: the gradient stays bright enough in light mode too.
     var onAccent: Color { .black }

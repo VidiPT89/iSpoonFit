@@ -3,8 +3,10 @@ import SwiftUI
 struct SessionCompleteView: View {
     let day: ProgramDay
     let durationSeconds: Int
+    let daysDone: Int
     let lowEnergy: Bool
-    let onFinish: (Int?, Int?, String?) -> Void
+    let offersProgramLink: Bool
+    let onFinish: (_ energy: Int?, _ discomfort: Int?, _ note: String?, _ showProgram: Bool) -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var energy: Int?
@@ -29,7 +31,12 @@ struct SessionCompleteView: View {
                     stats
                     checkIn
                     GradientButton(titleKey: "action.done", icon: "checkmark") {
-                        onFinish(energy, discomfort, note.isEmpty ? nil : note)
+                        finish(showProgram: false)
+                    }
+                    if offersProgramLink {
+                        OutlineButton(titleKey: "session.viewProgram", icon: "calendar") {
+                            finish(showProgram: true)
+                        }
                     }
                 }
                 .padding(.horizontal, 22)
@@ -42,6 +49,11 @@ struct SessionCompleteView: View {
                 checkmarkIn = true
             }
         }
+    }
+
+    private func finish(showProgram: Bool) {
+        let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        onFinish(energy, discomfort, trimmed.isEmpty ? nil : trimmed, showProgram)
     }
 
     // MARK: - Pieces
@@ -86,7 +98,7 @@ struct SessionCompleteView: View {
                 icon: "clock.fill"
             )
             statTile(
-                value: "\(day.index)",
+                value: "\(daysDone)",
                 unit: "/ \(ProgramData.totalDays)",
                 labelKey: "today.daysDone",
                 icon: "flame.fill"
@@ -208,7 +220,9 @@ struct ConfettiView: View {
         )
     }
 
-    private let start = Date()
+    /// Held in state so re-rendering the parent (tapping a check-in score,
+    /// typing a note) does not restart the fall from the top.
+    @State private var start = Date()
     let theme = Theme.shared
 
     struct Piece {
