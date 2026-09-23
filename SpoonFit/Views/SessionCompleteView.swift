@@ -223,6 +223,9 @@ struct ConfettiView: View {
     /// Held in state so re-rendering the parent (tapping a check-in score,
     /// typing a note) does not restart the fall from the top.
     @State private var start = Date()
+    /// Every piece has faded out after three falls, so the timeline stops
+    /// redrawing instead of animating an empty canvas forever.
+    @State private var isDone = false
     let theme = Theme.shared
 
     struct Piece {
@@ -236,7 +239,7 @@ struct ConfettiView: View {
     }
 
     var body: some View {
-        TimelineView(.animation) { timeline in
+        TimelineView(.animation(paused: isDone)) { timeline in
             Canvas { context, size in
                 let elapsed = timeline.date.timeIntervalSince(start)
                 for piece in pieces {
@@ -265,6 +268,10 @@ struct ConfettiView: View {
                     )
                 }
             }
+        }
+        .task {
+            try? await Task.sleep(for: .seconds(15))
+            isDone = true
         }
     }
 

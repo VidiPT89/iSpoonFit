@@ -12,6 +12,7 @@ struct SettingsView: View {
     @State private var reminderTime: Date
     @State private var startDate: Date
     @State private var remindersDenied = false
+    @State private var reminderWeekdays = ReminderManager.weekdays
     @State private var showsSafety = false
     @State private var showsHistory = false
     @State private var showsRestartConfirmation = false
@@ -168,11 +169,48 @@ struct SettingsView: View {
                     .foregroundStyle(theme.text)
                     .tint(theme.accent)
 
+                    weekdayPicker
+
                     Text(t("settings.reminderDays"))
                         .font(.caption)
                         .foregroundStyle(theme.textFaint)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
+            }
+        }
+    }
+
+    private var weekdayPicker: some View {
+        HStack(spacing: 5) {
+            ForEach(ReminderManager.weekOrder, id: \.self) { weekday in
+                let isOn = reminderWeekdays.contains(weekday)
+                Button {
+                    // At least one day has to stay selected.
+                    guard !(isOn && reminderWeekdays.count == 1) else { return }
+                    Haptics.selection()
+                    withAnimation(theme.snappyAnimation) {
+                        if isOn { reminderWeekdays.remove(weekday) } else { reminderWeekdays.insert(weekday) }
+                    }
+                    ReminderManager.weekdays = reminderWeekdays
+                    Task { await viewModel.updateReminder(enabled: true, time: reminderTime) }
+                } label: {
+                    Text(t(ReminderManager.weekdayKey(weekday)))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(isOn ? theme.onAccent : theme.textDim)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 9)
+                        .background {
+                            if isOn {
+                                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                    .fill(theme.accentGradient)
+                            } else {
+                                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                    .fill(theme.panel2)
+                            }
+                        }
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(isOn ? [.isSelected] : [])
             }
         }
     }

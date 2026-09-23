@@ -6,11 +6,13 @@ import Foundation
 enum ExerciseMotionKind: String, CaseIterable {
     // Standing
     case marchInPlace
+    case gentleSquat
     case squat
     case sumoSquat
     case pulseSquat
     case hipCircle
     case armSwing
+    case shortLunge
     case lunge
     case wallSit
     case calfRaise
@@ -32,8 +34,8 @@ enum ExerciseMotionKind: String, CaseIterable {
     /// ground line so the figure still sits on it.
     var isHorizontal: Bool {
         switch self {
-        case .marchInPlace, .squat, .sumoSquat, .pulseSquat, .hipCircle,
-             .armSwing, .lunge, .wallSit, .calfRaise, .quadStretch:
+        case .marchInPlace, .gentleSquat, .squat, .sumoSquat, .pulseSquat, .hipCircle,
+             .armSwing, .shortLunge, .lunge, .wallSit, .calfRaise, .quadStretch:
             return false
         default:
             return true
@@ -46,7 +48,7 @@ enum ExerciseMotionKind: String, CaseIterable {
     var prop: ExerciseProp? {
         switch self {
         case .wallSit: return .wall
-        case .calfRaise, .lunge, .quadStretch: return .chair
+        case .calfRaise, .shortLunge, .lunge, .quadStretch: return .chair
         case .hamstringStretch: return .towel
         default: return nil
         }

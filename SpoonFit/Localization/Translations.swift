@@ -112,7 +112,10 @@ enum Translations {
             .pt: "As notificações estão desligadas para o SpoonFit. Ativa-as nas Definições do iPhone.",
             .en: "Notifications are off for SpoonFit. Turn them on in the iPhone Settings app."
         ],
-        "settings.reminderDays": [.pt: "Nos dias de treino, de segunda a quinta.", .en: "On training days, Monday to Thursday."],
+        "settings.reminderDays": [
+            .pt: "Por defeito, nos dias de treino, de segunda a quinta.",
+            .en: "By default on training days, Monday to Thursday."
+        ],
         "settings.startDate": [.pt: "Data de início", .en: "Start date"],
         "settings.restart": [.pt: "Reiniciar programa", .en: "Restart program"],
         "settings.restartConfirm": [

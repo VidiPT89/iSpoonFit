@@ -187,6 +187,12 @@ struct ProgramView: View {
                         Text(t(day.weekdayKey))
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(theme.accent)
+                        if viewModel.isCompletedOnlyOnLowEnergy(day) {
+                            Image(systemName: "leaf.fill")
+                                .font(.caption2)
+                                .foregroundStyle(theme.ok)
+                                .accessibilityLabel(t("lowEnergy.title"))
+                        }
                         if isNext {
                             ChipView(text: t("session.next"), filled: true)
                         }

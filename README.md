@@ -15,7 +15,7 @@
 - ✅ Low-energy mode: shorter work intervals, longer rests, one round fewer and no added load, decided per day
 - ✅ Water bottles as the only progression tool, introduced on the days where it matters
 - ✅ Progress tracking with a session history, weekly progress, total minutes and five unlockable achievements
-- ✅ Weekly reminders for the four training days, scheduled locally
+- ✅ Local workout reminders at the time and on the weekdays you choose (Monday to Thursday by default)
 - ✅ Exercise library with step-by-step instructions, breathing cues, common mistakes and an easier version of every movement
 - ✅ Animated splash screen with developer credits, then straight into the app
 - ✅ Runtime language switch: Português (PT-PT) and English, independent of the system locale
@@ -89,11 +89,11 @@ xcodebuild -project SpoonFit.xcodeproj -scheme SpoonFit \
   -destination 'platform=iOS Simulator,name=iPhone 17' test
 ```
 
-63 tests cover the programme data, the session builder, the animation poses, the translations and the session and programme view models.
+64 tests cover the programme data, the session builder, the animation poses, the translations and the session and programme view models.
 
 ## 🔒 Privacy
 
-iSpoonFit works entirely on your device. There is no account, no sign-in and no network code in the app. Your session history and preferences stay in the app's own storage and are removed when you delete the app.
+iSpoonFit works entirely on your device. There is no account, no sign-in and no network code in the app. Your session history and preferences stay in the app's own storage and are removed when you delete the app. See [PRIVACY.md](PRIVACY.md) for the full policy.
 
 > This app is a general fitness guide and not a medical device. Always consult a healthcare professional before starting.
 

@@ -228,6 +228,9 @@ struct SessionPlayerView: View {
             }
         }
         .frame(width: 186, height: 186)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(phaseTitle)
+        .accessibilityValue(player.isPaused ? t("session.paused") : "\(player.remaining) s")
     }
 
     private var tip: some View {

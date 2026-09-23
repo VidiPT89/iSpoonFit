@@ -118,6 +118,12 @@ final class ProgramViewModel {
 
     func isCompleted(_ day: ProgramDay) -> Bool { completedDayIndices.contains(day.index) }
 
+    /// Done, but only ever in low-energy mode: the calendar marks it with a leaf.
+    func isCompletedOnlyOnLowEnergy(_ day: ProgramDay) -> Bool {
+        let runs = sessions.filter { $0.dayIndex == day.index }
+        return !runs.isEmpty && runs.allSatisfy(\.lowEnergy)
+    }
+
     func completedDays(inWeek week: Int) -> Int {
         ProgramData.days(inWeek: week).filter { isCompleted($0) }.count
     }

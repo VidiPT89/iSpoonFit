@@ -19,13 +19,6 @@ jobs:
       - name: Generate project
         run: xcodegen generate
 
-      - name: Build
-        run: |
-          xcodebuild -project SpoonFit.xcodeproj \
-            -scheme SpoonFit \
-            -destination 'generic/platform=iOS Simulator' \
-            build
-
       - name: Pick a simulator
         run: |
           xcrun simctl list devices available

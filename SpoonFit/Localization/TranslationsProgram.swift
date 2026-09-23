@@ -10,6 +10,9 @@ extension Translations {
         "weekday.tue": [.pt: "Ter", .en: "Tue"],
         "weekday.wed": [.pt: "Qua", .en: "Wed"],
         "weekday.thu": [.pt: "Qui", .en: "Thu"],
+        "weekday.fri": [.pt: "Sex", .en: "Fri"],
+        "weekday.sat": [.pt: "Sáb", .en: "Sat"],
+        "weekday.sun": [.pt: "Dom", .en: "Sun"],
 
         "block.warmup": [.pt: "Aquecimento", .en: "Warm-up"],
         "block.workout": [.pt: "Treino", .en: "Workout"],

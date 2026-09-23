@@ -101,7 +101,7 @@ final class ExerciseMotionPoseTests: XCTestCase {
     }
 
     func testAlternatingMotionsShowBothSides() {
-        for kind in [ExerciseMotionKind.lunge, .birdDog, .marchingBridge, .heelTap, .deadBug] {
+        for kind in [ExerciseMotionKind.lunge, .shortLunge, .birdDog, .marchingBridge, .heelTap, .deadBug] {
             let first = ExerciseMotionPose.pose(for: kind, phase: 0.25)
             let second = ExerciseMotionPose.pose(for: kind, phase: 0.75)
             XCTAssertNotEqual(first, second, "\(kind.rawValue) looks identical on both halves of the cycle")
@@ -124,6 +124,20 @@ final class ExerciseMotionPoseTests: XCTestCase {
             return (values.max() ?? 0) - (values.min() ?? 0)
         }
         XCTAssertLessThan(hipTravel(.pulseSquat), hipTravel(.squat))
+    }
+
+    func testGentleVariantsMoveLessThanTheFullOnes() {
+        func hipTravel(_ kind: ExerciseMotionKind) -> CGFloat {
+            let values = samplePhases.map { ExerciseMotionPose.pose(for: kind, phase: $0).hip.y }
+            return (values.max() ?? 0) - (values.min() ?? 0)
+        }
+        XCTAssertLessThan(hipTravel(.gentleSquat), hipTravel(.squat))
+
+        func stride(_ kind: ExerciseMotionKind) -> CGFloat {
+            let pose = ExerciseMotionPose.pose(for: kind, phase: 0.25)
+            return abs(pose.footR.x - pose.footL.x)
+        }
+        XCTAssertLessThan(stride(.shortLunge), stride(.lunge))
     }
 
     func testSumoSquatStandsWiderThanAPlainSquat() {

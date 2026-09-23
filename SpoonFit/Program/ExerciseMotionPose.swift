@@ -77,11 +77,13 @@ enum ExerciseMotionPose {
         let p = phase - phase.rounded(.down)
         switch kind {
         case .marchInPlace: return marchInPlace(p)
+        case .gentleSquat: return squat(p, depth: 0.5)
         case .squat: return squat(p, depth: 1)
         case .sumoSquat: return sumoSquat(p)
         case .pulseSquat: return pulseSquat(p)
         case .hipCircle: return hipCircle(p)
         case .armSwing: return armSwing(p)
+        case .shortLunge: return lunge(p, stepLength: 0.7)
         case .lunge: return lunge(p, stepLength: 1)
         case .wallSit: return wallSit(p)
         case .calfRaise: return calfRaise(p)

@@ -12,7 +12,7 @@ enum ExerciseCatalog {
         ),
         Exercise(
             id: .gentleSquat, nameKey: "exercise.gentleSquat", category: .warmup,
-            motion: .squat, isUnilateral: false, isAlternating: false,
+            motion: .gentleSquat, isUnilateral: false, isAlternating: false,
             muscleKeys: ["muscle.quads", "muscle.glutes"]
         ),
         Exercise(
@@ -39,7 +39,7 @@ enum ExerciseCatalog {
         ),
         Exercise(
             id: .shortLunge, nameKey: "exercise.shortLunge", category: .legsGlutes,
-            motion: .lunge, isUnilateral: false, isAlternating: true,
+            motion: .shortLunge, isUnilateral: false, isAlternating: true,
             muscleKeys: ["muscle.quads", "muscle.glutes"]
         ),
         Exercise(
