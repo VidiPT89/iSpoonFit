@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TodayView: View {
     let viewModel: ProgramViewModel
+    var firstName: String?
     var onShowProgram: () -> Void = {}
 
     @State private var activeDay: ProgramDay?
@@ -12,7 +13,7 @@ struct TodayView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 18) {
-                ScreenHeader(titleKey: greetingKey, subtitle: formattedToday)
+                ScreenHeader(title: greeting, subtitle: formattedToday)
                     .padding(.top, 8)
 
                 progressCard
@@ -52,12 +53,15 @@ struct TodayView: View {
 
     // MARK: - Header helpers
 
-    private var greetingKey: String {
+    private var greeting: String {
+        let key: String
         switch Calendar.current.component(.hour, from: Date()) {
-        case 5..<12: return "greeting.morning"
-        case 12..<19: return "greeting.afternoon"
-        default: return "greeting.evening"
+        case 5..<12: key = "greeting.morning"
+        case 12..<19: key = "greeting.afternoon"
+        default: key = "greeting.evening"
         }
+        guard let firstName, !firstName.isEmpty else { return t(key) }
+        return "\(t(key)), \(firstName)"
     }
 
     private var formattedToday: String {

@@ -7,3 +7,4 @@ build/
 *.xcodeproj/project.xcworkspace/xcuserdata/
 *.xcodeproj/
 SpoonFit/Info.plist
+SpoonFit/SpoonFit.entitlements

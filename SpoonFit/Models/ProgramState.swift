@@ -9,12 +9,21 @@ final class ProgramState {
     var reminderTime: Date?
     var reminderEnabled: Bool
     var medicalClearance: Bool
+    /// Bumped on every change; the newer side wins when devices disagree.
+    var updatedAt: Date = Date.now
 
-    init(startDate: Date, reminderTime: Date? = nil, reminderEnabled: Bool = false, medicalClearance: Bool = false) {
+    init(
+        startDate: Date,
+        reminderTime: Date? = nil,
+        reminderEnabled: Bool = false,
+        medicalClearance: Bool = false,
+        updatedAt: Date = .now
+    ) {
         self.startDate = startDate
         self.reminderTime = reminderTime
         self.reminderEnabled = reminderEnabled
         self.medicalClearance = medicalClearance
+        self.updatedAt = updatedAt
     }
 
     /// The first Monday strictly after `date`: the default start, which always

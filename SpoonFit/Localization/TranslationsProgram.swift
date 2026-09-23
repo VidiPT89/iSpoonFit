@@ -121,7 +121,7 @@ extension Translations {
 
         // MARK: Check-in
         "checkin.title": [.pt: "Como te sentes?", .en: "How do you feel?"],
-        "checkin.optional": [.pt: "Opcional, fica só no teu telemóvel.", .en: "Optional, stays only on your phone."],
+        "checkin.optional": [.pt: "Opcional, guardado só na tua conta.", .en: "Optional, saved only to your account."],
         "checkin.energy": [.pt: "Como está a tua energia?", .en: "How is your energy?"],
         "checkin.discomfort": [.pt: "Algum desconforto?", .en: "Any discomfort?"],
         "checkin.note": [.pt: "Nota", .en: "Note"],

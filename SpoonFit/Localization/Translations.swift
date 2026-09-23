@@ -6,7 +6,7 @@ import Foundation
 enum Translations {
     static let table: [String: [Lang: String]] = {
         var merged = core
-        for part in [program, exercises, cues] {
+        for part in [program, exercises, cues, account] {
             merged.merge(part) { current, _ in current }
         }
         return merged

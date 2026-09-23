@@ -10,7 +10,9 @@ final class ProgramViewModel {
     private(set) var state: ProgramState?
     private(set) var sessions: [CompletedSession] = []
 
-    private var context: ModelContext?
+    private(set) var context: ModelContext?
+    /// Nil for a local-only session (tests, or a debug build without Firebase).
+    private(set) var sync: CloudSyncing?
     private let calendar = Calendar.current
 
     /// Reset every calendar day, so "low-energy" never silently carries over.
@@ -34,12 +36,13 @@ final class ProgramViewModel {
 
     // MARK: - Loading
 
-    func load(context: ModelContext) {
+    func load(context: ModelContext, sync: CloudSyncing? = nil) {
         self.context = context
+        self.sync = sync
         refresh()
     }
 
-    private func refresh() {
+    func refresh() {
         guard let context else { return }
         state = (try? context.fetch(FetchDescriptor<ProgramState>()))?.first
         let descriptor = FetchDescriptor<CompletedSession>(sortBy: [SortDescriptor(\.date, order: .reverse)])
@@ -59,6 +62,7 @@ final class ProgramViewModel {
         context.insert(newState)
         try? context.save()
         refresh()
+        pushState()
         if let reminderTime {
             Task { await updateReminder(enabled: true, time: reminderTime) }
         }
@@ -74,13 +78,16 @@ final class ProgramViewModel {
         guard let state, let context else { return granted }
         state.reminderEnabled = enabled && granted
         state.reminderTime = time
+        state.updatedAt = .now
         try? context.save()
+        pushState()
         return granted
     }
 
-    /// Reminder text is fixed when it is scheduled, so a language change
-    /// reschedules it in the new language.
-    func refreshReminderLanguage() {
+    /// Reminders are scheduled on the device, so they are set up again after
+    /// signing in on a new phone, and after a language change, since their
+    /// text is fixed when scheduled.
+    func rescheduleReminderIfNeeded() {
         guard let state, state.reminderEnabled, let time = state.reminderTime else { return }
         Task { await ReminderManager.schedule(at: time) }
     }
@@ -88,8 +95,10 @@ final class ProgramViewModel {
     func updateStartDate(_ date: Date) {
         guard let state, let context else { return }
         state.startDate = calendar.startOfDay(for: date)
+        state.updatedAt = .now
         try? context.save()
         refresh()
+        pushState()
     }
 
     // MARK: - Progress
@@ -195,24 +204,39 @@ final class ProgramViewModel {
         try? context.save()
         lowEnergyToday = false
         refresh()
+        push(session)
     }
 
     func delete(_ session: CompletedSession) {
         guard let context else { return }
+        let id = session.uuid
         context.delete(session)
         try? context.save()
         refresh()
+        removeRemoteSessions([id])
     }
 
     func restartProgram() {
         guard let context else { return }
+        let ids = sessions.map(\.uuid)
         for session in sessions {
             context.delete(session)
         }
         state?.startDate = ProgramState.nextMonday()
+        state?.updatedAt = .now
         try? context.save()
         lowEnergyToday = false
         refresh()
+        removeRemoteSessions(ids)
+        pushState()
+    }
+
+    /// Clears what this device keeps outside the account's store, so the
+    /// next person to sign in on it starts clean.
+    static func clearDeviceState() {
+        UserDefaults.standard.removeObject(forKey: lowEnergyKey)
+        UserDefaults.standard.removeObject(forKey: lowEnergyDayKey)
+        ReminderManager.cancelAll()
     }
 
     // MARK: - Achievements

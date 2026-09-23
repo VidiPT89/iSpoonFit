@@ -6,6 +6,13 @@ options:
 configs:
   Debug: debug
   Release: release
+packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: 12.0.0
+  GoogleSignIn:
+    url: https://github.com/google/GoogleSignIn-iOS
+    from: 9.0.0
 targets:
   SpoonFit:
     type: application
@@ -13,6 +20,25 @@ targets:
     deploymentTarget: "17.0"
     sources:
       - path: SpoonFit
+    dependencies:
+      - package: Firebase
+        product: FirebaseAuth
+      - package: Firebase
+        product: FirebaseFirestore
+      - package: GoogleSignIn
+        product: GoogleSignIn
+    entitlements:
+      path: SpoonFit/SpoonFit.entitlements
+      properties:
+        com.apple.developer.applesignin:
+          - Default
+    postBuildScripts:
+      - name: Register sign-in URL schemes
+        basedOnDependencyAnalysis: false
+        # Declared as an input so the step runs after Xcode writes Info.plist.
+        inputFiles:
+          - $(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)
+        script: sh "$SRCROOT/scripts/register-url-schemes.sh"
     info:
       path: SpoonFit/Info.plist
       properties:
@@ -35,6 +61,8 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
   SpoonFitTests:
     type: bundle.unit-test
     platform: iOS

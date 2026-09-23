@@ -12,8 +12,15 @@ final class CompletedSession {
     var energy: Int?
     var discomfort: Int?
     var note: String?
+    /// Stable identity across devices, also the cloud document id.
+    var uuid: String = UUID().uuidString
+    /// True once the cloud has confirmed this row. A synced row that later
+    /// goes missing from the cloud was deleted on another device.
+    var isSynced: Bool = false
 
     init(
+        uuid: String = UUID().uuidString,
+        isSynced: Bool = false,
         dayIndex: Int,
         date: Date = Date(),
         durationSeconds: Int,
@@ -22,6 +29,8 @@ final class CompletedSession {
         discomfort: Int? = nil,
         note: String? = nil
     ) {
+        self.uuid = uuid
+        self.isSynced = isSynced
         self.dayIndex = dayIndex
         self.date = date
         self.durationSeconds = durationSeconds

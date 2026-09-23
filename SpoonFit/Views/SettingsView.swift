@@ -2,6 +2,8 @@ import SwiftUI
 
 struct SettingsView: View {
     let viewModel: ProgramViewModel
+    let auth: AuthService
+    let onAccountDeleted: () -> Void
 
     @State private var lang = LocalizationManager.shared
     @State private var theme = Theme.shared
@@ -17,8 +19,10 @@ struct SettingsView: View {
     @State private var showsHistory = false
     @State private var showsRestartConfirmation = false
 
-    init(viewModel: ProgramViewModel) {
+    init(viewModel: ProgramViewModel, auth: AuthService, onAccountDeleted: @escaping () -> Void) {
         self.viewModel = viewModel
+        self.auth = auth
+        self.onAccountDeleted = onAccountDeleted
         let state = viewModel.state
         _reminderEnabled = State(initialValue: state?.reminderEnabled ?? false)
         _reminderTime = State(initialValue: state?.reminderTime
@@ -33,6 +37,7 @@ struct SettingsView: View {
                     ScreenHeader(titleKey: "tab.settings")
                         .padding(.top, 8)
 
+                    AccountCard(auth: auth, viewModel: viewModel, onAccountDeleted: onAccountDeleted)
                     languageCard
                     appearanceCard
                     sessionCard

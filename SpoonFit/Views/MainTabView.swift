@@ -2,6 +2,8 @@ import SwiftUI
 
 struct MainTabView: View {
     let viewModel: ProgramViewModel
+    let auth: AuthService
+    let onAccountDeleted: () -> Void
 
     @State private var selection: Tab = .today
     @Namespace private var indicator
@@ -37,12 +39,13 @@ struct MainTabView: View {
             ZStack {
                 switch selection {
                 case .today:
-                    TodayView(viewModel: viewModel) {
+                    TodayView(viewModel: viewModel, firstName: auth.user?.firstName) {
                         withAnimation(theme.snappyAnimation) { selection = .program }
                     }
                 case .program: ProgramView(viewModel: viewModel)
                 case .exercises: ExerciseLibraryView()
-                case .settings: SettingsView(viewModel: viewModel)
+                case .settings:
+                    SettingsView(viewModel: viewModel, auth: auth, onAccountDeleted: onAccountDeleted)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

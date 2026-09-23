@@ -258,7 +258,8 @@ struct LanguagePill: View {
 
 /// Standard screen header: large title on the left, language pill on the right.
 struct ScreenHeader<Trailing: View>: View {
-    let titleKey: String
+    /// Already translated, so a screen can add to it (a name, a date).
+    let title: String
     var subtitle: String? = nil
     @ViewBuilder var trailing: Trailing
 
@@ -267,8 +268,10 @@ struct ScreenHeader<Trailing: View>: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(t(titleKey))
+                Text(title)
                     .font(.largeTitle.bold())
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.7)
                     .foregroundStyle(theme.text)
                 if let subtitle {
                     Text(subtitle)
@@ -283,7 +286,11 @@ struct ScreenHeader<Trailing: View>: View {
 }
 
 extension ScreenHeader where Trailing == LanguagePill {
+    init(title: String, subtitle: String? = nil) {
+        self.init(title: title, subtitle: subtitle) { LanguagePill() }
+    }
+
     init(titleKey: String, subtitle: String? = nil) {
-        self.init(titleKey: titleKey, subtitle: subtitle) { LanguagePill() }
+        self.init(title: t(titleKey), subtitle: subtitle) { LanguagePill() }
     }
 }

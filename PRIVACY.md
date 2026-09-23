@@ -2,30 +2,33 @@
 
 **iSpoonFit** · Last updated: 23 September 2026
 
-iSpoonFit does not collect, store or share any personal data outside your device.
+iSpoonFit needs an account so your programme and progress follow you between devices. This policy explains what that account stores and nothing more.
 
-## What the app keeps
+## What is stored with your account
 
-Everything stays on your iPhone or iPad, in the app's own storage:
+- **Sign-in details:** your email address and name, or the identifier Apple, Google or Microsoft shares when you choose to continue with them. Passwords are handled by Firebase Authentication and never seen by the app.
+- **Your programme:** start date, reminder settings and your medical-clearance confirmation.
+- **Your workouts:** the day completed, date, duration, whether it was a low-energy day, and the optional check-in (energy, discomfort and a free-text note).
 
-- Your programme start date and reminder settings
-- Completed workouts, including the optional check-in (energy, discomfort and a free-text note)
-- Preferences such as language, appearance, sounds, voice and haptics
+This data is stored with Google Firebase (Authentication and Cloud Firestore) in the European Union (`eur3`). Security rules only let a signed-in user read and write their own data.
+
+## What stays on your device
+
+Language, appearance, sounds, voice, haptics and reminder days are kept only on the device. A copy of your progress is also kept on the device so the app works offline; it syncs when a connection is available.
 
 ## What the app does not do
 
-- No account or sign-in
 - No analytics, advertising or tracking
-- No network requests of any kind
+- No selling or sharing of your data with anyone
 - No access to Health, location, contacts, camera or microphone
 
 ## Notifications
 
-Workout reminders are local notifications scheduled on the device by iOS. They are only used if you turn them on, and you can switch them off at any time in the app or in the iPhone Settings app.
+Workout reminders are local notifications scheduled on the device by iOS. They are only used if you turn them on.
 
 ## Deleting your data
 
-Restarting the programme in Settings removes your workout history. Deleting the app removes everything it stored.
+**Settings → Account → Delete account** permanently deletes your account and every workout, check-in and setting stored with it, both in the cloud and on the device. Restarting the programme in Settings removes your workout history while keeping the account.
 
 ## Health notice
 

@@ -1,0 +1,202 @@
+import SwiftData
+import XCTest
+@testable import SpoonFit
+
+/// In-memory stand-in for the cloud, so the merge rules can be tested
+/// without a network or a Firebase project.
+@MainActor
+private final class FakeCloud: CloudSyncing {
+    var state: RemoteState?
+    var sessions: [String: RemoteSession] = [:]
+    var isReachable = true
+
+    func fetch() async throws -> CloudSnapshot {
+        guard isReachable else { throw URLError(.notConnectedToInternet) }
+        return CloudSnapshot(state: state, sessions: Array(sessions.values))
+    }
+
+    func save(state: RemoteState) async throws { self.state = state }
+    func save(session: RemoteSession) async throws { sessions[session.id] = session }
+    func deleteSession(id: String) async throws { sessions[id] = nil }
+
+    func deleteEverything() async throws {
+        state = nil
+        sessions = [:]
+    }
+}
+
+@MainActor
+final class CloudSyncTests: XCTestCase {
+    private func makeDevice(_ cloud: FakeCloud) throws -> ProgramViewModel {
+        let container = try ModelContainer(
+            for: ProgramState.self, CompletedSession.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let viewModel = ProgramViewModel()
+        viewModel.load(context: ModelContext(container), sync: cloud)
+        return viewModel
+    }
+
+    /// Lets the fire-and-forget uploads started by a mutation finish.
+    private func settle() async {
+        for _ in 0..<5 { await Task.yield() }
+    }
+
+    private var day1: ProgramDay { ProgramData.day(at: 1)! }
+    private var day2: ProgramDay { ProgramData.day(at: 2)! }
+
+    // MARK: - Merging
+
+    func testANewPhoneRestoresTheProgramAndHistoryFromTheCloud() async throws {
+        let cloud = FakeCloud()
+        let first = try makeDevice(cloud)
+        first.startProgram(startDate: Date(), reminderTime: nil, medicalClearance: true)
+        first.complete(day: day1, durationSeconds: 1_000, lowEnergy: true, energy: 4)
+        await settle()
+
+        let second = try makeDevice(cloud)
+        XCTAssertFalse(second.hasOnboarded)
+        await second.synchronize()
+
+        XCTAssertTrue(second.hasOnboarded)
+        XCTAssertEqual(second.completedDayIndices, [1])
+        XCTAssertEqual(second.sessions.first?.energy, 4)
+        XCTAssertEqual(second.sessions.first?.lowEnergy, true)
+    }
+
+    func testWorkoutsLoggedOfflineAreUploadedOnTheNextSync() async throws {
+        let cloud = FakeCloud()
+        cloud.isReachable = false
+        let phone = try makeDevice(cloud)
+        phone.startProgram(startDate: Date(), reminderTime: nil, medicalClearance: true)
+        await phone.synchronize()
+
+        cloud.isReachable = true
+        cloud.sessions = [:]
+        phone.complete(day: day1, durationSeconds: 900, lowEnergy: false)
+        cloud.sessions = [:]  // pretend the live upload never arrived
+
+        await phone.synchronize()
+        await settle()
+
+        XCTAssertEqual(cloud.sessions.count, 1)
+        XCTAssertEqual(cloud.sessions.values.first?.dayIndex, 1)
+    }
+
+    func testAWorkoutDeletedOnAnotherPhoneDisappearsHereToo() async throws {
+        let cloud = FakeCloud()
+        let first = try makeDevice(cloud)
+        first.startProgram(startDate: Date(), reminderTime: nil, medicalClearance: true)
+        first.complete(day: day1, durationSeconds: 900, lowEnergy: false)
+        first.complete(day: day2, durationSeconds: 900, lowEnergy: false)
+        await settle()
+
+        let second = try makeDevice(cloud)
+        await second.synchronize()
+        XCTAssertEqual(second.completedCount, 2)
+
+        let dayOne = try XCTUnwrap(first.sessions.first { $0.dayIndex == 1 })
+        first.delete(dayOne)
+        await settle()
+
+        await second.synchronize()
+        XCTAssertEqual(second.completedDayIndices, [2])
+    }
+
+    func testTheMostRecentSettingsChangeWins() async throws {
+        let cloud = FakeCloud()
+        let phone = try makeDevice(cloud)
+        phone.startProgram(startDate: Date(), reminderTime: nil, medicalClearance: true)
+        await settle()
+
+        let later = Calendar.current.date(byAdding: .day, value: 14, to: Date())!
+        var newer = try XCTUnwrap(cloud.state)
+        newer.startDate = Calendar.current.startOfDay(for: later)
+        newer.updatedAt = Date().addingTimeInterval(60)
+        cloud.state = newer
+
+        await phone.synchronize()
+        XCTAssertEqual(phone.state?.startDate, newer.startDate)
+    }
+
+    func testNothingChangesLocallyWhenTheCloudIsUnreachable() async throws {
+        let cloud = FakeCloud()
+        let phone = try makeDevice(cloud)
+        phone.startProgram(startDate: Date(), reminderTime: nil, medicalClearance: true)
+        phone.complete(day: day1, durationSeconds: 900, lowEnergy: false)
+        await settle()
+
+        cloud.isReachable = false
+        cloud.sessions = [:]
+        await phone.synchronize()
+
+        XCTAssertEqual(phone.completedCount, 1)
+    }
+
+    func testRestartingTheProgramClearsTheCloudHistory() async throws {
+        let cloud = FakeCloud()
+        let phone = try makeDevice(cloud)
+        phone.startProgram(startDate: Date(), reminderTime: nil, medicalClearance: true)
+        phone.complete(day: day1, durationSeconds: 900, lowEnergy: false)
+        await settle()
+        XCTAssertEqual(cloud.sessions.count, 1)
+
+        phone.restartProgram()
+        await settle()
+
+        XCTAssertTrue(cloud.sessions.isEmpty)
+    }
+
+    // MARK: - Records
+
+    func testRecordsSurviveARoundTripThroughPlainFields() throws {
+        let session = RemoteSession(
+            id: "abc", dayIndex: 7, date: Date(timeIntervalSince1970: 1_800_000_000),
+            durationSeconds: 1_140, lowEnergy: true, energy: 3, discomfort: 2, note: "Joelho bem"
+        )
+        let numbers = session.fields.mapValues { value -> Any in
+            // The database hands numbers back as NSNumber.
+            (value as? Int).map { NSNumber(value: $0) } ?? (value as? Double).map { NSNumber(value: $0) } ?? value
+        }
+        XCTAssertEqual(RemoteSession(id: "abc", fields: numbers), session)
+
+        let state = RemoteState(
+            startDate: Date(timeIntervalSince1970: 1_790_000_000), reminderEnabled: true,
+            reminderTime: Date(timeIntervalSince1970: 1_790_030_000), medicalClearance: true,
+            updatedAt: Date(timeIntervalSince1970: 1_790_050_000)
+        )
+        let stateNumbers = state.fields.mapValues { ($0 as? Double).map { NSNumber(value: $0) } ?? $0 }
+        XCTAssertEqual(RemoteState(fields: stateNumbers), state)
+    }
+
+    func testMalformedCloudRecordsAreIgnored() {
+        XCTAssertNil(RemoteSession(id: "x", fields: ["dayIndex": NSNumber(value: 99), "date": NSNumber(value: 1)]))
+        XCTAssertNil(RemoteSession(id: "x", fields: ["dayIndex": NSNumber(value: 3)]))
+        XCTAssertNil(RemoteState(fields: ["reminderEnabled": true]))
+
+        let clamped = RemoteSession(id: "x", fields: [
+            "dayIndex": NSNumber(value: 3), "date": NSNumber(value: 1), "energy": NSNumber(value: 9)
+        ])
+        XCTAssertEqual(clamped?.energy, 5)
+    }
+
+    // MARK: - Sign-in form
+
+    func testFormValidationCatchesTheCommonMistakes() {
+        XCTAssertEqual(AuthValidation.problemKey(name: " ", email: "a@b.pt", password: "secret1"), "auth.error.nameMissing")
+        XCTAssertEqual(AuthValidation.problemKey(name: nil, email: "ana@", password: "secret1"), "auth.error.invalidEmail")
+        XCTAssertEqual(AuthValidation.problemKey(name: nil, email: "ana@mail.pt", password: "12345"), "auth.error.weakPassword")
+        XCTAssertNil(AuthValidation.problemKey(name: "Ana", email: " ana@mail.pt ", password: "123456"))
+        XCTAssertNil(AuthValidation.problemKey(name: nil, email: "ana.silva+treino@mail.co.uk", password: "123456"))
+    }
+
+    func testAccountShowsTheFirstNameAndHowItSignsIn() {
+        let user = AccountUser(uid: "1", name: "Ana Maria Silva", email: "ana@mail.pt", providerIDs: ["google.com"])
+        XCTAssertEqual(user.firstName, "Ana")
+        XCTAssertEqual(user.providerLabelKey, "auth.provider.google")
+        XCTAssertEqual(
+            AccountUser(uid: "2", name: nil, email: "x@y.pt", providerIDs: ["password"]).providerLabelKey,
+            "auth.provider.email"
+        )
+    }
+}

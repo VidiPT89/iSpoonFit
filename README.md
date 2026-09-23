@@ -7,6 +7,8 @@
 
 ## ✨ Features
 
+- ✅ Personal accounts: sign up with email and password, or continue with Apple, Google or Microsoft
+- ✅ Progress synced to your account with Cloud Firestore, so it follows you to any iPhone or iPad, and keeps working offline
 - ✅ A complete 28-session plan: seven weeks, four sessions per week, Monday to Thursday, across four phases of progression
 - ✅ 21 bodyweight exercises across warm-up, legs and glutes, core and stretching, each with its own animated demonstration
 - ✅ Stick-figure animations drawn live with `Canvas` and `TimelineView`: every movement is generated from code, no video and no image assets
@@ -22,7 +24,7 @@
 - ✅ Dark mode, Light mode and System mode
 - ✅ Colour identity taken from [ividi.dev](https://ividi.dev/): burnt orange, amber and near-black
 - ✅ Accessibility: VoiceOver labels, Dynamic Type and full Reduce Motion support
-- ✅ Fully offline: no account, no network requests, no analytics
+- ✅ Private by design: each account can only reach its own data, no analytics, no ads, and in-app account deletion
 
 ## 🛠️ Tech Stack
 
@@ -32,7 +34,9 @@
 | UI | SwiftUI |
 | Graphics | Canvas + TimelineView |
 | Architecture | MVVM with `@Observable` |
-| Persistence | SwiftData |
+| Persistence | SwiftData (per-account store on device) |
+| Accounts & sync | Firebase Authentication + Cloud Firestore |
+| Sign-in | Email/password, Sign in with Apple, Google Sign-In, Microsoft (OAuth) |
 | Audio | AVSpeechSynthesizer + system sounds (no audio files) |
 | Notifications | UserNotifications |
 | Project | XcodeGen |
@@ -57,19 +61,30 @@ open SpoonFit.xcodeproj
 
 Build and run (`⌘R`) on the simulator or a connected device.
 
+### Firebase
+
+The app talks to the Firebase project `ispoonfit-vidi`. Its iOS config lives in `SpoonFit/Config/GoogleService-Info.plist`; after enabling a new sign-in provider in the console, refresh it with:
+
+```bash
+sh scripts/fetch-firebase-config.sh
+```
+
+A build phase reads that file and registers the URL schemes Google and Microsoft sign-in return on. Firestore security rules live in `firebase/firestore.rules` and are deployed with `firebase deploy --only firestore`.
+
 > The Xcode project is generated from `project.yml` and is not committed. If you add or move Swift files, regenerate it with `xcodegen generate`.
 
 ## 📖 Usage
 
-1. Run through the short onboarding and confirm you have medical clearance to exercise
-2. Open **Today** and start the session the programme has queued for you
-3. Follow the animated figure: it loops at the pace you should be moving at
-4. Rest screens preview the next exercise, so you always know what is coming
-5. Feeling flat? Turn on **Low-energy day** before starting, or switch to it mid-session, and the whole workout adapts
+1. Create an account, or continue with Apple, Google or Microsoft
+2. Run through the short onboarding and confirm you have medical clearance to exercise
+3. Open **Today** and start the session the programme has queued for you
+4. Follow the animated figure: it loops at the pace you should be moving at
+5. Rest screens preview the next exercise, so you always know what is coming
+6. Feeling flat? Turn on **Low-energy day** before starting, or switch to it mid-session, and the whole workout adapts
 
 Days unlock in order and missing a day costs you nothing, the programme simply waits. Friday to Sunday are rest days by design.
 
-Language, appearance, sounds, voice, haptics and reminders are all adjustable in Settings.
+Language, appearance, sounds, voice, haptics, reminders and your account (sign out, delete) are all in Settings.
 
 ## 🗓️ The Programme
 
@@ -89,11 +104,11 @@ xcodebuild -project SpoonFit.xcodeproj -scheme SpoonFit \
   -destination 'platform=iOS Simulator,name=iPhone 17' test
 ```
 
-64 tests cover the programme data, the session builder, the animation poses, the translations and the session and programme view models.
+74 tests cover the programme data, the session builder, the animation poses, the translations, the view models, the sign-in form and the cloud sync merge rules.
 
 ## 🔒 Privacy
 
-iSpoonFit works entirely on your device. There is no account, no sign-in and no network code in the app. Your session history and preferences stay in the app's own storage and are removed when you delete the app. See [PRIVACY.md](PRIVACY.md) for the full policy.
+Your account stores only your sign-in details, your programme settings and your workouts, in Firebase in the EU. Security rules keep every account to its own data, there are no analytics or ads, and the account can be deleted from Settings at any time. See [PRIVACY.md](PRIVACY.md) for the full policy.
 
 > This app is a general fitness guide and not a medical device. Always consult a healthcare professional before starting.
 
