@@ -23,12 +23,22 @@ jobs:
         run: |
           xcodebuild -project SpoonFit.xcodeproj \
             -scheme SpoonFit \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -destination 'generic/platform=iOS Simulator' \
             build
+
+      - name: Pick a simulator
+        run: |
+          xcrun simctl list devices available
+          UDID=$(xcrun simctl list devices available \
+            | grep -E '^ +iPhone' \
+            | tail -1 \
+            | sed -E 's/.*\(([0-9A-Fa-f-]{36})\).*/\1/')
+          if [ -z "$UDID" ]; then echo "No iOS simulator available on this runner"; exit 1; fi
+          echo "SIMULATOR_UDID=$UDID" >> "$GITHUB_ENV"
 
       - name: Test
         run: |
           xcodebuild -project SpoonFit.xcodeproj \
             -scheme SpoonFit \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -destination "id=$SIMULATOR_UDID" \
             test
