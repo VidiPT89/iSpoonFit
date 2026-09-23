@@ -1,0 +1,316 @@
+import SwiftUI
+
+struct TodayView: View {
+    let viewModel: ProgramViewModel
+
+    @State private var activeDay: ProgramDay?
+    @State private var appeared = false
+
+    let theme = Theme.shared
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 18) {
+                ScreenHeader(titleKey: greetingKey, subtitle: formattedToday)
+                    .padding(.top, 8)
+
+                progressCard
+
+                if viewModel.isProgramComplete {
+                    completeCard
+                } else if viewModel.isRestDayToday {
+                    restDayCard
+                } else if let day = viewModel.nextDay {
+                    workoutCard(day)
+                }
+
+                achievementsStrip
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 24)
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 12)
+        }
+        .scrollIndicators(.hidden)
+        .onAppear {
+            withAnimation(theme.springAnimation.delay(0.05)) { appeared = true }
+        }
+        .fullScreenCover(item: $activeDay) { day in
+            SessionPlayerView(day: day, lowEnergy: viewModel.lowEnergyToday, viewModel: viewModel)
+        }
+    }
+
+    // MARK: - Header helpers
+
+    private var greetingKey: String {
+        switch Calendar.current.component(.hour, from: Date()) {
+        case 5..<12: return "greeting.morning"
+        case 12..<19: return "greeting.afternoon"
+        default: return "greeting.evening"
+        }
+    }
+
+    private var formattedToday: String {
+        let formatter = DateFormatter()
+        formatter.locale = LocalizationManager.shared.current.locale
+        formatter.setLocalizedDateFormatFromTemplate("EEEEdMMMM")
+        return formatter.string(from: Date()).capitalizedFirst
+    }
+
+    // MARK: - Cards
+
+    private var progressCard: some View {
+        HStack(spacing: 18) {
+            ProgressRing(
+                progress: viewModel.progress,
+                lineWidth: 9,
+                centerText: "\(viewModel.completedCount)",
+                centerCaption: t("today.ofTotal", ProgramData.totalDays)
+            )
+            .frame(width: 78, height: 78)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text(t("today.progress"))
+                    .font(.headline)
+                    .foregroundStyle(theme.text)
+
+                HStack(spacing: 8) {
+                    ChipView(text: "\(viewModel.weeksCompleted) \(t("today.weeksDone"))", icon: "calendar")
+                    ChipView(text: "\(viewModel.totalMinutes) min", icon: "clock.fill")
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(18)
+        .panelBackground()
+    }
+
+    private func workoutCard(_ day: ProgramDay) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("\(t("week.n", day.week)) · \(t("day.n", day.index))")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(theme.accent)
+                    Text(t(day.titleKey))
+                        .font(.title2.bold())
+                        .foregroundStyle(theme.text)
+                }
+                Spacer()
+                ChipView(
+                    text: t("params.minutes", SessionBuilder.estimatedMinutes(for: day, lowEnergy: viewModel.lowEnergyToday)),
+                    icon: "clock.fill",
+                    filled: true
+                )
+            }
+
+            if !day.focusKeys.isEmpty {
+                HStack(spacing: 8) {
+                    ForEach(day.focusKeys, id: \.self) { key in
+                        ChipView(text: t(key))
+                    }
+                    Spacer(minLength: 0)
+                }
+            }
+
+            VStack(spacing: 10) {
+                ForEach(exercises(for: day)) { ref in
+                    HStack(spacing: 12) {
+                        ExerciseDemoThumbnail(ref: ref, size: 46)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(t(ref.catalogEntry.nameKey))
+                                .font(.subheadline.weight(.medium))
+                                .foregroundStyle(theme.text)
+                            if let label = ref.modifierLabel {
+                                Text(label)
+                                    .font(.caption)
+                                    .foregroundStyle(theme.accent)
+                            }
+                        }
+                        Spacer(minLength: 0)
+                    }
+                }
+            }
+
+            lowEnergyToggle
+
+            GradientButton(titleKey: "today.start", icon: "play.fill") {
+                Haptics.impact(.medium)
+                activeDay = day
+            }
+        }
+        .padding(18)
+        .panelBackground(highlighted: true)
+    }
+
+    private func exercises(for day: ProgramDay) -> [ExerciseRef] {
+        viewModel.lowEnergyToday ? day.exercises.map(\.softened) : day.exercises
+    }
+
+    private var lowEnergyToggle: some View {
+        Button {
+            Haptics.selection()
+            withAnimation(theme.snappyAnimation) { viewModel.lowEnergyToday.toggle() }
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "leaf.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(viewModel.lowEnergyToday ? theme.ok : theme.textFaint)
+                    .symbolRenderingMode(.hierarchical)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(t("lowEnergy.title"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(theme.text)
+                    Text(t("lowEnergy.subtitle"))
+                        .font(.caption)
+                        .foregroundStyle(theme.textDim)
+                        .multilineTextAlignment(.leading)
+                }
+                Spacer(minLength: 0)
+
+                Toggle("", isOn: Binding(
+                    get: { viewModel.lowEnergyToday },
+                    set: { viewModel.lowEnergyToday = $0 }
+                ))
+                .labelsHidden()
+                .tint(theme.ok)
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(theme.panel2)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var restDayCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                Image(systemName: "moon.stars.fill")
+                    .font(.title3)
+                    .foregroundStyle(theme.rest)
+                    .symbolRenderingMode(.hierarchical)
+                Text(t("today.restDay"))
+                    .font(.title3.bold())
+                    .foregroundStyle(theme.text)
+                Spacer()
+            }
+
+            Text(t("today.restTip"))
+                .font(.subheadline)
+                .foregroundStyle(theme.textDim)
+                .fixedSize(horizontal: false, vertical: true)
+
+            VStack(spacing: 10) {
+                restSuggestion("figure.walk", "today.restWalk")
+                restSuggestion("wind", "today.restBreathing")
+                restSuggestion("figure.flexibility", "today.restStretch")
+            }
+
+            if let day = viewModel.nextDay {
+                Divider().overlay(theme.accent.opacity(0.12))
+                HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(t("today.nextWorkout"))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(theme.textFaint)
+                        Text(t(day.titleKey))
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(theme.text)
+                    }
+                    Spacer()
+                    ChipView(text: countdownLabel, icon: "calendar")
+                }
+            }
+        }
+        .padding(18)
+        .panelBackground()
+    }
+
+    private var countdownLabel: String {
+        let days = viewModel.daysUntilNextTrainingDay
+        return days <= 1 ? t("today.nextTomorrow") : t("today.nextInDays", days)
+    }
+
+    private func restSuggestion(_ icon: String, _ key: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.footnote)
+                .foregroundStyle(theme.accent)
+                .frame(width: 22)
+                .symbolRenderingMode(.hierarchical)
+            Text(t(key))
+                .font(.subheadline)
+                .foregroundStyle(theme.textDim)
+            Spacer(minLength: 0)
+        }
+    }
+
+    private var completeCard: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "trophy.fill")
+                .font(.system(size: 42))
+                .foregroundStyle(theme.accentGradient)
+                .symbolEffect(.bounce, options: .nonRepeating, value: appeared)
+
+            Text(t("today.programComplete"))
+                .font(.title3.bold())
+                .foregroundStyle(theme.text)
+
+            Text(t("today.programCompleteBody"))
+                .font(.subheadline)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(theme.textDim)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(24)
+        .panelBackground(highlighted: true)
+    }
+
+    private var achievementsStrip: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionHeader(titleKey: "achievements.title", icon: "rosette")
+
+            ScrollView(.horizontal) {
+                HStack(spacing: 10) {
+                    ForEach(Achievement.allCases) { achievement in
+                        let unlocked = viewModel.isUnlocked(achievement)
+                        VStack(spacing: 7) {
+                            Image(systemName: achievement.icon)
+                                .font(.title3)
+                                .foregroundStyle(unlocked ? AnyShapeStyle(theme.accentGradient) : AnyShapeStyle(theme.textFaint))
+                                .symbolRenderingMode(.hierarchical)
+                            Text(t(achievement.titleKey))
+                                .font(.caption2)
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(unlocked ? theme.text : theme.textFaint)
+                        }
+                        .frame(width: 96, height: 82)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(theme.panel)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .strokeBorder(
+                                    unlocked ? theme.accent.opacity(0.35) : theme.accent.opacity(0.08),
+                                    lineWidth: 1
+                                )
+                        )
+                        .opacity(unlocked ? 1 : 0.55)
+                    }
+                }
+            }
+            .scrollIndicators(.hidden)
+        }
+    }
+}
+
+extension String {
+    var capitalizedFirst: String {
+        guard let first else { return self }
+        return String(first).uppercased() + dropFirst()
+    }
+}

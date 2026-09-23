@@ -1,0 +1,196 @@
+import Foundation
+
+enum BlockKind: String, Codable, CaseIterable {
+    case warmup, workout, cooldown
+
+    var titleKey: String {
+        switch self {
+        case .warmup: return "block.warmup"
+        case .workout: return "block.workout"
+        case .cooldown: return "block.cooldown"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .warmup: return "sunrise.fill"
+        case .workout: return "flame.fill"
+        case .cooldown: return "leaf.fill"
+        }
+    }
+}
+
+/// Small adjustments layered on top of a catalog exercise for a given day.
+enum Modifier: String, Codable, CaseIterable {
+    case deeper, hold2s, hold1s, slow, pulse, weighted
+
+    var labelKey: String { "modifier.\(rawValue)" }
+    var descriptionKey: String { "modifier.\(rawValue).desc" }
+
+    /// How long one full repetition takes, used to slow down or speed up the
+    /// demo animation so it matches the instruction.
+    var cycleDuration: Double? {
+        switch self {
+        case .slow: return 6
+        case .pulse: return 0.6
+        case .hold2s: return 3.2
+        case .hold1s: return 2.6
+        default: return nil
+        }
+    }
+}
+
+enum ExerciseCategory: String, Codable, CaseIterable, Identifiable {
+    case warmup, legsGlutes, core, stretch
+
+    var id: String { rawValue }
+    var titleKey: String { "category.\(rawValue)" }
+
+    var icon: String {
+        switch self {
+        case .warmup: return "sunrise.fill"
+        case .legsGlutes: return "figure.strengthtraining.functional"
+        case .core: return "figure.core.training"
+        case .stretch: return "figure.flexibility"
+        }
+    }
+}
+
+/// Stable identifier for every exercise in the catalog. Also the prefix used
+/// to look up its coaching text (`cue.<rawValue>.steps` and friends).
+enum ExerciseID: String, Codable, CaseIterable, Identifiable {
+    case marchInPlace, gentleSquat, hipCircles, armSwings
+    case sumoSquat, squat, shortLunge, alternatingLunge, wallSit, calfRaise, sideLegRaise
+    case gluteBridge, marchingBridge, birdDog, deadBug, heelTaps, pelvicTilt
+    case childsPose, figureFour, quadStretch, hamstringStretch
+
+    var id: String { rawValue }
+
+    var stepsKey: String { "cue.\(rawValue).steps" }
+    var breathingKey: String { "cue.\(rawValue).breathing" }
+    var mistakeKey: String { "cue.\(rawValue).mistake" }
+    var easierKey: String { "cue.\(rawValue).easier" }
+    var cautionKey: String { "cue.\(rawValue).caution" }
+}
+
+struct Exercise: Identifiable, Hashable {
+    let id: ExerciseID
+    let nameKey: String
+    let category: ExerciseCategory
+    let motion: ExerciseMotionKind
+    let isUnilateral: Bool
+    let isAlternating: Bool
+    let muscleKeys: [String]
+
+    var name: String { t(nameKey) }
+}
+
+/// An exercise as it appears on a specific day, with that day's modifiers.
+struct ExerciseRef: Codable, Hashable, Identifiable {
+    let exercise: ExerciseID
+    let modifiers: [Modifier]
+
+    var id: String { ([exercise.rawValue] + modifiers.map(\.rawValue)).joined(separator: "-") }
+
+    init(_ exercise: ExerciseID, modifiers: [Modifier] = []) {
+        self.exercise = exercise
+        self.modifiers = modifiers
+    }
+
+    var catalogEntry: Exercise { ExerciseCatalog.exercise(exercise) }
+
+    /// "Agachamento sumo · com garrafas"
+    var displayName: String {
+        let base = t(catalogEntry.nameKey)
+        guard !modifiers.isEmpty else { return base }
+        return base + " · " + modifiers.map { t($0.labelKey) }.joined(separator: ", ")
+    }
+
+    var modifierLabel: String? {
+        guard !modifiers.isEmpty else { return nil }
+        return modifiers.map { t($0.labelKey) }.joined(separator: " · ")
+    }
+
+    /// Removing the load and softening the pulse is what "low-energy day" does
+    /// to each exercise, before the timing changes are applied.
+    var softened: ExerciseRef {
+        ExerciseRef(exercise, modifiers: modifiers.filter { $0 != .weighted })
+    }
+
+    var animationCycleDuration: Double {
+        modifiers.compactMap(\.cycleDuration).min() ?? 2.0
+    }
+}
+
+struct WeekParams: Hashable {
+    let work: Int
+    let rest: Int
+    let rounds: Int
+    let phaseKey: String
+
+    var phaseDescriptionKey: String { phaseKey + ".desc" }
+}
+
+struct ProgramDay: Identifiable, Hashable {
+    let index: Int
+    let titleKey: String
+    let exercises: [ExerciseRef]
+
+    var id: Int { index }
+
+    /// Weeks 1...7, four training days each.
+    var week: Int { (index - 1) / 4 + 1 }
+
+    /// 0 = Monday ... 3 = Thursday.
+    var weekday: Int { (index - 1) % 4 }
+
+    var weekdayKey: String {
+        ["weekday.mon", "weekday.tue", "weekday.wed", "weekday.thu"][weekday]
+    }
+
+    var params: WeekParams { ProgramData.params(forWeek: week) }
+
+    var isFinalDay: Bool { index == ProgramData.totalDays }
+
+    /// Distinct focus areas across the day's exercises, for the chips on the
+    /// Today card.
+    var focusKeys: [String] {
+        var keys: [String] = []
+        for ref in exercises {
+            let entry = ref.catalogEntry
+            let key: String
+            switch entry.category {
+            case .core: key = "focus.core"
+            case .legsGlutes: key = entry.muscleKeys.contains("muscle.glutes") ? "focus.glutes" : "focus.thighs"
+            default: continue
+            }
+            if !keys.contains(key) { keys.append(key) }
+        }
+        return keys
+    }
+}
+
+enum StepKind: String, Hashable {
+    case getReady, work, rest
+}
+
+/// One timed slice of a guided session. `ref` on a rest or get-ready step is
+/// the exercise that comes next, so the player can preview it.
+struct SessionStep: Identifiable, Hashable {
+    let id: Int
+    let kind: StepKind
+    let block: BlockKind
+    let ref: ExerciseRef
+    let round: Int
+    let totalRounds: Int
+    let seconds: Int
+
+    var isRest: Bool { kind == .rest }
+    var isWork: Bool { kind == .work }
+
+    /// Unilateral work is split down the middle with a "switch sides" cue.
+    var switchSideAtSecond: Int? {
+        guard kind == .work, ref.catalogEntry.isUnilateral else { return nil }
+        return seconds / 2
+    }
+}
