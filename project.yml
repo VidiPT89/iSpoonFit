@@ -43,6 +43,9 @@ targets:
       path: iSpoonFit/Info.plist
       properties:
         CFBundleDisplayName: iSpoonFit
+        # Only standard HTTPS (Firebase): exempt, so TestFlight skips the
+        # export-compliance question on every build.
+        ITSAppUsesNonExemptEncryption: false
         UILaunchScreen:
           UIColorName: LaunchBackground
         UIUserInterfaceStyle: Automatic
@@ -62,6 +65,7 @@ targets:
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: S769436W24
         ENABLE_USER_SCRIPT_SANDBOXING: NO
   iSpoonFitTests:
     type: bundle.unit-test
