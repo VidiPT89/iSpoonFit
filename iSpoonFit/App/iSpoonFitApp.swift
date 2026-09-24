@@ -2,7 +2,7 @@ import GoogleSignIn
 import SwiftUI
 
 @main
-struct SpoonFitApp: App {
+struct iSpoonFitApp: App {
     init() {
         FirebaseSetup.configure()
     }

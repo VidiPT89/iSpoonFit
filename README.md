@@ -57,14 +57,14 @@
 git clone https://github.com/VidiPT89/iSpoonFit.git
 cd iSpoonFit
 xcodegen generate
-open SpoonFit.xcodeproj
+open iSpoonFit.xcodeproj
 ```
 
 Build and run (`⌘R`) on the simulator or a connected device.
 
 ### Firebase
 
-The app talks to the Firebase project `ispoonfit-vidi`. Its iOS config lives in `SpoonFit/Config/GoogleService-Info.plist`; after enabling a new sign-in provider in the console, refresh it with:
+The app talks to the Firebase project `ispoonfit-vidi`. Its iOS config lives in `iSpoonFit/Config/GoogleService-Info.plist`; after enabling a new sign-in provider in the console, refresh it with:
 
 ```bash
 sh scripts/fetch-firebase-config.sh
@@ -102,7 +102,7 @@ Two versions of the programme share the same 28 workouts and differ only in the 
 
 | Programme | Stretching |
 |-----------|------------|
-| **SpoonFit 28** (default) | The same four stretches every day, 2 minutes |
+| **iSpoonFit 28** (default) | The same four stretches every day, 2 minutes |
 | **Ana's 28-day challenge** | Week 1: two one-minute stretches chosen for each day, including hip flexors and a standing side stretch. Days 5 to 27: child's pose 30 s, then figure-4, quad and hamstring 30 s per side. Day 28: 2 minutes |
 
 New accounts start on the default. The admin can assign another programme from the admin panel, or ahead of time with a profile prepared for that email.
@@ -110,7 +110,7 @@ New accounts start on the default. The admin can assign another programme from t
 ## 🧪 Testing
 
 ```bash
-xcodebuild -project SpoonFit.xcodeproj -scheme SpoonFit \
+xcodebuild -project iSpoonFit.xcodeproj -scheme iSpoonFit \
   -destination 'platform=iOS Simulator,name=iPhone 17' test
 ```
 

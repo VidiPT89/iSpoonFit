@@ -1,6 +1,6 @@
 import SwiftData
 import XCTest
-@testable import SpoonFit
+@testable import iSpoonFit
 
 /// In-memory stand-in for the cloud, so the merge rules can be tested
 /// without a network or a Firebase project.

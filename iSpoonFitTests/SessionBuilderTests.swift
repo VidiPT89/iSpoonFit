@@ -1,5 +1,5 @@
 import XCTest
-@testable import SpoonFit
+@testable import iSpoonFit
 
 final class SessionBuilderTests: XCTestCase {
     private func day(_ index: Int) -> ProgramDay {

@@ -75,7 +75,7 @@ struct AuthView: View {
                     .foregroundStyle(theme.onAccent)
             }
             HStack(spacing: 0) {
-                Text("Spoon").foregroundStyle(theme.text)
+                Text("iSpoon").foregroundStyle(theme.text)
                 Text("Fit").foregroundStyle(theme.accentGradient)
             }
             .font(.system(size: 34, weight: .bold, design: .rounded))

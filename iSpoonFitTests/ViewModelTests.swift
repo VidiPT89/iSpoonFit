@@ -1,6 +1,6 @@
 import SwiftData
 import XCTest
-@testable import SpoonFit
+@testable import iSpoonFit
 
 @MainActor
 final class ViewModelTests: XCTestCase {

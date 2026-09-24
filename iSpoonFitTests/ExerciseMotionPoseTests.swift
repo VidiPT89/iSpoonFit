@@ -1,6 +1,6 @@
 import CoreGraphics
 import XCTest
-@testable import SpoonFit
+@testable import iSpoonFit
 
 final class ExerciseMotionPoseTests: XCTestCase {
     private let samplePhases: [Double] = stride(from: 0, to: 1, by: 0.05).map { $0 }

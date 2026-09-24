@@ -1,5 +1,5 @@
 import XCTest
-@testable import SpoonFit
+@testable import iSpoonFit
 
 final class TranslationsTests: XCTestCase {
     private func assertPresent(_ key: String, file: StaticString = #filePath, line: UInt = #line) {
@@ -217,7 +217,7 @@ final class TranslationsTests: XCTestCase {
         for language in Lang.allCases {
             manager.current = language
             let text = PlanTextExporter.text(for: day)
-            XCTAssertTrue(text.contains("SpoonFit"))
+            XCTAssertTrue(text.contains("iSpoonFit"))
             XCTAssertTrue(text.contains(t("block.warmup")))
             XCTAssertTrue(text.contains(t("block.cooldown")))
             XCTAssertFalse(text.contains("exercise."), "Untranslated key leaked into the shared text")

@@ -6,6 +6,8 @@
 #     sh scripts/fetch-firebase-config.sh
 set -eu
 cd "$(dirname "$0")/.."
-firebase apps:sdkconfig IOS 1:618033728790:ios:9274fc716f916133b6d437 \
+# The CLI refuses to overwrite, so the old copy goes first.
+rm -f iSpoonFit/Config/GoogleService-Info.plist
+firebase apps:sdkconfig IOS 1:618033728790:ios:71780cfff39b8401b6d437 \
   --project ispoonfit-vidi \
-  --out SpoonFit/Config/GoogleService-Info.plist
+  --out iSpoonFit/Config/GoogleService-Info.plist

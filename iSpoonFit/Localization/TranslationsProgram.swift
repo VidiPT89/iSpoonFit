@@ -150,12 +150,12 @@ extension Translations {
         "history.discomfortLabel": [.pt: "Desconforto %d/10", .en: "Discomfort %d/10"],
 
         // MARK: Reminders and sharing
-        "reminder.title": [.pt: "SpoonFit", .en: "SpoonFit"],
+        "reminder.title": [.pt: "iSpoonFit", .en: "iSpoonFit"],
         "reminder.body": [
             .pt: "O teu treino de 20 minutos está à tua espera 🧡",
             .en: "Your 20-minute workout is waiting for you 🧡"
         ],
         "share.weekTitle": [.pt: "Partilhar a semana", .en: "Share this week"],
-        "share.footer": [.pt: "SpoonFit · ividi.dev", .en: "SpoonFit · ividi.dev"]
+        "share.footer": [.pt: "iSpoonFit · ividi.dev", .en: "iSpoonFit · ividi.dev"]
     ]
 }

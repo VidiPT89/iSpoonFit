@@ -1,5 +1,5 @@
 import XCTest
-@testable import SpoonFit
+@testable import iSpoonFit
 
 /// Ana's challenge must match her written plan exactly.
 final class ProgramVariantTests: XCTestCase {

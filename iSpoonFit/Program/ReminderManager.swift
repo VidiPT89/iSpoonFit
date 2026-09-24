@@ -11,7 +11,7 @@ enum ReminderManager {
     /// Monday to Thursday, the training days.
     static let defaultWeekdays: Set<Int> = [2, 3, 4, 5]
 
-    private static let identifierPrefix = "spoonfit.reminder."
+    private static let identifierPrefix = "ispoonfit.reminder."
     private static let weekdaysKey = "reminderWeekdays"
 
     /// The days the user wants to be reminded on. Never empty.

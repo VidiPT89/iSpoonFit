@@ -33,7 +33,7 @@ final class UserSession {
     private static func makeContainer(uid: String) -> ModelContainer {
         let directory = storeDirectory(uid: uid)
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        let configuration = ModelConfiguration(schema: schema, url: directory.appending(path: "SpoonFit.store"))
+        let configuration = ModelConfiguration(schema: schema, url: directory.appending(path: "iSpoonFit.store"))
         if let container = try? ModelContainer(for: schema, configurations: configuration) {
             return container
         }

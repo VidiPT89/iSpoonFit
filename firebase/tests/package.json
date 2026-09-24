@@ -1,9 +1,9 @@
 {
-  "name": "spoonfit-firestore-rules-tests",
+  "name": "ispoonfit-firestore-rules-tests",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "cd ../.. && firebase emulators:exec --only firestore --project demo-spoonfit 'node firebase/tests/rules.test.mjs'"
+    "test": "cd ../.. && firebase emulators:exec --only firestore --project demo-ispoonfit 'node firebase/tests/rules.test.mjs'"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.0",

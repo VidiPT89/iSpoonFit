@@ -1,4 +1,4 @@
-name: SpoonFit
+name: iSpoonFit
 options:
   bundleIdPrefix: dev.ividi
   deploymentTarget:
@@ -14,12 +14,12 @@ packages:
     url: https://github.com/google/GoogleSignIn-iOS
     from: 9.0.0
 targets:
-  SpoonFit:
+  iSpoonFit:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
     sources:
-      - path: SpoonFit
+      - path: iSpoonFit
     dependencies:
       - package: Firebase
         product: FirebaseAuth
@@ -28,7 +28,7 @@ targets:
       - package: GoogleSignIn
         product: GoogleSignIn
     entitlements:
-      path: SpoonFit/SpoonFit.entitlements
+      path: iSpoonFit/iSpoonFit.entitlements
       properties:
         com.apple.developer.applesignin:
           - Default
@@ -40,9 +40,9 @@ targets:
           - $(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)
         script: sh "$SRCROOT/scripts/register-url-schemes.sh"
     info:
-      path: SpoonFit/Info.plist
+      path: iSpoonFit/Info.plist
       properties:
-        CFBundleDisplayName: SpoonFit
+        CFBundleDisplayName: iSpoonFit
         UILaunchScreen:
           UIColorName: LaunchBackground
         UIUserInterfaceStyle: Automatic
@@ -55,7 +55,7 @@ targets:
           - UIInterfaceOrientationLandscapeRight
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.ividi.spoonfit
+        PRODUCT_BUNDLE_IDENTIFIER: dev.ividi.ispoonfit
         SWIFT_VERSION: "5.0"
         TARGETED_DEVICE_FAMILY: "1,2"
         GENERATE_INFOPLIST_FILE: YES
@@ -63,29 +63,29 @@ targets:
         CURRENT_PROJECT_VERSION: "1"
         CODE_SIGN_STYLE: Automatic
         ENABLE_USER_SCRIPT_SANDBOXING: NO
-  SpoonFitTests:
+  iSpoonFitTests:
     type: bundle.unit-test
     platform: iOS
     deploymentTarget: "17.0"
     sources:
-      - path: SpoonFitTests
+      - path: iSpoonFitTests
     settings:
       base:
         SWIFT_VERSION: "5.0"
         GENERATE_INFOPLIST_FILE: YES
     dependencies:
-      - target: SpoonFit
+      - target: iSpoonFit
 schemes:
-  SpoonFit:
+  iSpoonFit:
     build:
       targets:
-        SpoonFit: all
-        SpoonFitTests: [test]
+        iSpoonFit: all
+        iSpoonFitTests: [test]
     run:
       config: Debug
     test:
       config: Debug
       targets:
-        - SpoonFitTests
+        - iSpoonFitTests
     archive:
       config: Release

@@ -67,7 +67,7 @@ struct SplashView: View {
 
     private var title: some View {
         HStack(spacing: 0) {
-            Text("Spoon")
+            Text("iSpoon")
                 .foregroundStyle(theme.text)
             Text("Fit")
                 .foregroundStyle(theme.accentGradient)

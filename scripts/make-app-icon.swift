@@ -5,7 +5,7 @@
 //
 //     swift scripts/make-app-icon.swift
 //
-// The output overwrites SpoonFit/Assets.xcassets/AppIcon.appiconset/icon-1024.png.
+// The output overwrites iSpoonFit/Assets.xcassets/AppIcon.appiconset/icon-1024.png.
 
 import AppKit
 import CoreGraphics
@@ -122,7 +122,7 @@ context.restoreGState()
 
 guard let image = context.makeImage() else { fatalError("Could not render the icon") }
 
-let outputURL = URL(fileURLWithPath: "SpoonFit/Assets.xcassets/AppIcon.appiconset/icon-1024.png")
+let outputURL = URL(fileURLWithPath: "iSpoonFit/Assets.xcassets/AppIcon.appiconset/icon-1024.png")
 let bitmap = NSBitmapImageRep(cgImage: image)
 guard let data = bitmap.representation(using: .png, properties: [:]) else {
     fatalError("Could not encode the PNG")

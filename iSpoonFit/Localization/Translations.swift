@@ -14,7 +14,7 @@ enum Translations {
 
     static let core: [String: [Lang: String]] = [
         // MARK: App and credits
-        "app.name": [.pt: "SpoonFit", .en: "SpoonFit"],
+        "app.name": [.pt: "iSpoonFit", .en: "iSpoonFit"],
         "app.tagline": [
             .pt: "Treino suave e progressivo, 20 minutos por dia",
             .en: "Gentle, progressive training, 20 minutes a day"
@@ -109,8 +109,8 @@ enum Translations {
         "settings.reminders": [.pt: "Lembretes", .en: "Reminders"],
         "settings.reminderTime": [.pt: "Hora do lembrete", .en: "Reminder time"],
         "settings.remindersDenied": [
-            .pt: "As notificações estão desligadas para o SpoonFit. Ativa-as nas Definições do iPhone.",
-            .en: "Notifications are off for SpoonFit. Turn them on in the iPhone Settings app."
+            .pt: "As notificações estão desligadas para o iSpoonFit. Ativa-as nas Definições do iPhone.",
+            .en: "Notifications are off for iSpoonFit. Turn them on in the iPhone Settings app."
         ],
         "settings.reminderDays": [
             .pt: "Por defeito, nos dias de treino, de segunda a quinta.",
@@ -139,7 +139,7 @@ enum Translations {
         "action.delete": [.pt: "Apagar", .en: "Delete"],
 
         // MARK: Onboarding
-        "onboarding.welcomeTitle": [.pt: "Bem-vinda ao SpoonFit", .en: "Welcome to SpoonFit"],
+        "onboarding.welcomeTitle": [.pt: "Bem-vinda ao iSpoonFit", .en: "Welcome to iSpoonFit"],
         "onboarding.welcomeBody": [
             .pt: "28 treinos de 20 minutos, de segunda a quinta, em casa e sem saltos. Cada semana avança um pouco, ao teu ritmo.",
             .en: "28 workouts of 20 minutes, Monday to Thursday, at home and with no jumping. Each week steps up a little, at your own pace."

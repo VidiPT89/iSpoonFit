@@ -69,7 +69,7 @@ extension Translations {
         ],
 
         // MARK: Programs
-        "variant.standard": [.pt: "SpoonFit 28", .en: "SpoonFit 28"],
+        "variant.standard": [.pt: "iSpoonFit 28", .en: "iSpoonFit 28"],
         "variant.standard.desc": [
             .pt: "O programa da app: os mesmos quatro alongamentos, 2 minutos, todos os dias.",
             .en: "The app's program: the same four stretches, 2 minutes, every day."

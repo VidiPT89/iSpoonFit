@@ -1,5 +1,5 @@
 import XCTest
-@testable import SpoonFit
+@testable import iSpoonFit
 
 final class ProgramDataTests: XCTestCase {
     func testProgramHasTwentyEightDays() {
