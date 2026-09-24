@@ -121,7 +121,7 @@ xcodebuild -project iSpoonFit.xcodeproj -scheme iSpoonFit \
   -destination 'platform=iOS Simulator,name=iPhone 17' test
 ```
 
-104 tests cover the care plan generator and every questionnaire rule, the programme data and Ana's plan, the session builder, the animation poses, the translations, the view models, the sign-in form, the admin role and the cloud sync merge rules.
+107 tests cover the care plan generator and every questionnaire rule, the programme data and Ana's plan, the session builder, the animation poses, the translations, the view models, the sign-in form, the admin role and the cloud sync merge rules.
 
 The Firestore security rules have their own tests against the local emulator (needs Java):
 

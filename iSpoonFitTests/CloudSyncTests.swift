@@ -54,8 +54,8 @@ final class CloudSyncTests: XCTestCase {
         for _ in 0..<5 { await Task.yield() }
     }
 
-    private var day1: ProgramDay { ProgramData.day(at: 1)! }
-    private var day2: ProgramDay { ProgramData.day(at: 2)! }
+    private var day1: ProgramDay { ProgramData.days.first(where: { $0.index == 1 })! }
+    private var day2: ProgramDay { ProgramData.days.first(where: { $0.index == 2 })! }
 
     // MARK: - Merging
 

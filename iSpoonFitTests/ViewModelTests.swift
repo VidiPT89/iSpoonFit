@@ -5,7 +5,7 @@ import XCTest
 @MainActor
 final class ViewModelTests: XCTestCase {
     private func day(_ index: Int) -> ProgramDay {
-        guard let day = ProgramData.day(at: index) else {
+        guard let day = ProgramData.days.first(where: { $0.index == index }) else {
             fatalError("Day \(index) should exist")
         }
         return day

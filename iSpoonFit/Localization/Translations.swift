@@ -66,8 +66,8 @@ enum Translations {
         "today.weeksDone": [.pt: "Semanas completas", .en: "Full weeks"],
         "today.programComplete": [.pt: "Programa concluído!", .en: "Program complete!"],
         "today.programCompleteBody": [
-            .pt: "Fizeste os 28 treinos. Podes repetir qualquer dia sempre que quiseres.",
-            .en: "You finished all 28 workouts. You can repeat any day whenever you like."
+            .pt: "Fizeste as 28 sessões. Podes repetir qualquer dia sempre que quiseres.",
+            .en: "You finished all 28 sessions. You can repeat any day whenever you like."
         ],
         "today.ofTotal": [.pt: "de %d", .en: "of %d"],
 

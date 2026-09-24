@@ -189,9 +189,6 @@ enum ExerciseCatalog {
         byID[id] ?? all[0]
     }
 
-    static func exercises(in category: ExerciseCategory) -> [Exercise] {
-        all.filter { $0.category == category }
-    }
 }
 
 extension ExerciseRef {

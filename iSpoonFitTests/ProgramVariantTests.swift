@@ -6,11 +6,11 @@ final class ProgramVariantTests: XCTestCase {
     private let ana = ProgramVariant.anaChallenge
 
     private func stretches(_ day: Int) -> [ExerciseID] {
-        ana.day(at: day)!.cooldown.map(\.ref.exercise)
+        ana.days(profile: nil)[day - 1].cooldown.map(\.ref.exercise)
     }
 
     private func seconds(_ day: Int) -> [Int] {
-        ana.day(at: day)!.cooldown.map(\.seconds)
+        ana.days(profile: nil)[day - 1].cooldown.map(\.seconds)
     }
 
     func testWorkoutsAreTheSameAsTheStandardProgram() {
@@ -45,10 +45,10 @@ final class ProgramVariantTests: XCTestCase {
     }
 
     func testTwoSidedStretchesSwitchHalfway() {
-        let steps = SessionBuilder.steps(for: ana.day(at: 5)!)
+        let steps = SessionBuilder.steps(for: ana.days(profile: nil)[4])
         let figureFour = steps.first { $0.block == .cooldown && $0.ref.exercise == .figureFour }
         XCTAssertEqual(figureFour?.switchSideAtSecond, 30)
-        let hipFlexor = SessionBuilder.steps(for: ana.day(at: 3)!).first { $0.ref.exercise == .hipFlexorStretch }
+        let hipFlexor = SessionBuilder.steps(for: ana.days(profile: nil)[2]).first { $0.ref.exercise == .hipFlexorStretch }
         XCTAssertEqual(hipFlexor?.switchSideAtSecond, 30)
     }
 

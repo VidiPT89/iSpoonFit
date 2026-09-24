@@ -139,12 +139,16 @@ struct OnboardingView: View {
                 .foregroundStyle(theme.textDim)
 
             VStack(spacing: 10) {
-                material("square.grid.3x3.fill", "material.mat")
-                material("chair.fill", "material.chair")
-                material("waterbottle.fill", "material.bottles")
-                material("square.stack.3d.up.fill", "material.towel")
+                ForEach(Material.needed(for: plannedDays)) { item in
+                    material(item.icon, item.titleKey)
+                }
             }
         }
+    }
+
+    /// The plan these answers will produce, for the material list.
+    private var plannedDays: [ProgramDay] {
+        viewModel.variant.isFixed ? viewModel.planDays : CarePlanGenerator.days(for: healthProfile)
     }
 
     private var startPage: some View {

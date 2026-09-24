@@ -112,10 +112,10 @@ extension Translations {
         "session.exitConfirm": [.pt: "Terminar por hoje", .en: "End for today"],
         "session.switchToLowEnergy": [.pt: "Mudar para Dia difícil", .en: "Switch to Low-energy day"],
         "session.totalTime": [.pt: "Tempo total", .en: "Total time"],
-        "session.finalTitle": [.pt: "Desafio final concluído!", .en: "Final challenge complete!"],
+        "session.finalTitle": [.pt: "Chegaste ao fim do programa!", .en: "You finished the program!"],
         "session.finalBody": [
-            .pt: "28 treinos, 7 semanas. Chegaste ao fim do programa.",
-            .en: "28 workouts, 7 weeks. You reached the end of the program."
+            .pt: "28 sessões em 7 semanas. Obrigado por cuidares de ti.",
+            .en: "28 sessions over 7 weeks. Thank you for taking care of yourself."
         ],
         "session.viewProgram": [.pt: "Ver programa", .en: "View program"],
 
@@ -133,7 +133,7 @@ extension Translations {
         "achievement.firstWeek": [.pt: "Semana 1 completa", .en: "Week 1 complete"],
         "achievement.halfway": [.pt: "Meio caminho", .en: "Halfway there"],
         "achievement.firstLoad": [.pt: "Primeira carga", .en: "First load"],
-        "achievement.finalChallenge": [.pt: "Desafio final", .en: "Final challenge"],
+        "achievement.finalChallenge": [.pt: "Programa completo", .en: "Program complete"],
 
         // MARK: History
         "history.title": [.pt: "Histórico", .en: "History"],

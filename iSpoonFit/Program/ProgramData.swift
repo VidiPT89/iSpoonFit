@@ -84,12 +84,5 @@ enum ProgramData {
         programDay(28, "day.finalChallenge", ref(.sumoSquat, .weighted), ref(.alternatingLunge), ref(.marchingBridge), ref(.heelTaps))
     ]
 
-    static func day(at index: Int) -> ProgramDay? {
-        guard index >= 1, index <= totalDays else { return nil }
-        return days[index - 1]
-    }
 
-    static func days(inWeek week: Int) -> [ProgramDay] {
-        days.filter { $0.week == week }
-    }
 }

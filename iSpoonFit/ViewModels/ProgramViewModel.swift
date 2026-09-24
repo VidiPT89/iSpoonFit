@@ -307,6 +307,12 @@ final class ProgramViewModel {
 
     // MARK: - Achievements
 
+    /// "First load" only makes sense in plans that use water bottles.
+    var achievements: [Achievement] {
+        let usesLoad = planDays.contains { day in day.exercises.contains { $0.modifiers.contains(.weighted) } }
+        return Achievement.allCases.filter { $0 != .firstLoad || usesLoad }
+    }
+
     func isUnlocked(_ achievement: Achievement) -> Bool {
         achievement.isUnlocked(in: self)
     }

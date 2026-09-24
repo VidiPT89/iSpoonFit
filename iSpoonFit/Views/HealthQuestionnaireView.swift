@@ -207,21 +207,64 @@ struct HealthQuestionnaireForm: View {
     }
 
     private func numberField(_ titleKey: String, value: Binding<Int?>) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(t(titleKey)).font(.caption2).foregroundStyle(theme.textFaint)
-            TextField("", value: value, format: .number)
-                .keyboardType(.numberPad)
-                .questionnaireField()
-        }
+        QuestionnaireNumberField(
+            titleKey: titleKey,
+            value: Binding(
+                get: { value.wrappedValue.map(Double.init) },
+                set: { value.wrappedValue = $0.map { Int($0) } }
+            ),
+            allowsDecimals: false
+        )
     }
 
     private func decimalField(_ titleKey: String, value: Binding<Double?>) -> some View {
+        QuestionnaireNumberField(titleKey: titleKey, value: value, allowsDecimals: true)
+    }
+}
+
+/// A number box that keeps the text exactly as typed (so "68," can become
+/// "68,5") and passes the parsed value on at every keystroke, instead of
+/// only when the field loses focus as a formatted `TextField(value:)` does.
+private struct QuestionnaireNumberField: View {
+    let titleKey: String
+    @Binding var value: Double?
+    let allowsDecimals: Bool
+
+    @State private var text = ""
+    let theme = Theme.shared
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(t(titleKey)).font(.caption2).foregroundStyle(theme.textFaint)
-            TextField("", value: value, format: .number.precision(.fractionLength(0...1)))
-                .keyboardType(.decimalPad)
+            TextField("", text: $text)
+                .keyboardType(allowsDecimals ? .decimalPad : .numberPad)
                 .questionnaireField()
+                .onAppear { text = value.map(QuestionnaireNumbers.text) ?? "" }
+                .onChange(of: text) { _, newValue in
+                    value = allowsDecimals
+                        ? QuestionnaireNumbers.decimal(newValue)
+                        : QuestionnaireNumbers.integer(newValue).map(Double.init)
+                }
         }
+    }
+}
+
+/// Reads the numbers typed in the questionnaire, accepting the Portuguese
+/// decimal comma as well as a point.
+enum QuestionnaireNumbers {
+    static func integer(_ text: String) -> Int? {
+        Int(text.filter(\.isNumber).prefix(3))
+    }
+
+    static func decimal(_ text: String) -> Double? {
+        let cleaned = text.replacingOccurrences(of: ",", with: ".")
+            .filter { $0.isNumber || $0 == "." }
+        return Double(cleaned.prefix(6))
+    }
+
+    /// Whole numbers without a trailing ".0".
+    static func text(_ value: Double) -> String {
+        value.rounded() == value ? String(Int(value)) : String(value)
     }
 }
 

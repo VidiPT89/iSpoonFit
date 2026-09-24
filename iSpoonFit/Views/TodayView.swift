@@ -401,7 +401,7 @@ struct TodayView: View {
 
             ScrollView(.horizontal) {
                 HStack(spacing: 10) {
-                    ForEach(Achievement.allCases) { achievement in
+                    ForEach(viewModel.achievements) { achievement in
                         let unlocked = viewModel.isUnlocked(achievement)
                         VStack(spacing: 7) {
                             Image(systemName: achievement.icon)

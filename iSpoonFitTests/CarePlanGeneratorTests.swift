@@ -218,3 +218,47 @@ extension CarePlanGeneratorTests {
         }
     }
 }
+
+extension CarePlanGeneratorTests {
+    func testMaterialsFollowWhatThePlanUses() {
+        let seated = CarePlanGenerator.days(for: HealthProfile(limitations: [.cannotGetToFloor]))
+        XCTAssertEqual(Material.needed(for: seated), [.chair])
+
+        let ana = ProgramVariant.anaChallenge.days(profile: nil)
+        XCTAssertEqual(Material.needed(for: ana), [.chair, .mat, .bottles, .towel])
+
+        let generated = CarePlanGenerator.days(for: HealthProfile(activity: .regular))
+        XCTAssertFalse(Material.needed(for: generated).contains(.bottles), "Care plans never use bottles")
+    }
+
+    func testLowEnergyStillEasesTheGentlestPlan() {
+        let day = CarePlanGenerator.days(for: .empty)[0]
+        XCTAssertEqual(day.params.rounds, 2)
+        let eased = SessionBuilder.params(for: day, lowEnergy: true)
+        XCTAssertEqual(eased.rounds, 1)
+        XCTAssertEqual(eased.work, 15)
+        XCTAssertGreaterThan(eased.rest, day.params.rest)
+    }
+
+    func testTypedNumbersAcceptTheDecimalComma() {
+        XCTAssertEqual(QuestionnaireNumbers.decimal("68,5"), 68.5)
+        XCTAssertEqual(QuestionnaireNumbers.decimal("68.5"), 68.5)
+        XCTAssertEqual(QuestionnaireNumbers.decimal("68,"), 68)
+        XCTAssertNil(QuestionnaireNumbers.decimal(""))
+        XCTAssertEqual(QuestionnaireNumbers.integer("4a2"), 42)
+        XCTAssertEqual(QuestionnaireNumbers.text(70), "70")
+        XCTAssertEqual(QuestionnaireNumbers.text(70.5), "70.5")
+    }
+}
+
+@MainActor
+final class AchievementsForPlanTests: XCTestCase {
+    func testFirstLoadOnlyAppearsInPlansWithBottles() throws {
+        let personal = ProgramViewModel()
+        XCTAssertFalse(personal.achievements.contains(.firstLoad))
+
+        let ana = ProgramViewModel()
+        ana.assignedProgramID = ProgramVariant.anaChallenge.rawValue
+        XCTAssertTrue(ana.achievements.contains(.firstLoad))
+    }
+}

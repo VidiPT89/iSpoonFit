@@ -80,13 +80,15 @@ struct AdminUserDetailView: View {
                     .font(.subheadline)
                     .foregroundStyle(theme.textFaint)
             }
+            // Titles come from the plan; generated once, not once per row.
+            let days = user.variant.days(profile: nil)
             ForEach(user.sortedSessions, id: \.id) { session in
-                sessionRow(session, variant: user.variant)
+                sessionRow(session, days: days)
             }
         }
     }
 
-    private func sessionRow(_ session: RemoteSession, variant: ProgramVariant) -> some View {
+    private func sessionRow(_ session: RemoteSession, days: [ProgramDay]) -> some View {
         HStack(alignment: .top, spacing: 13) {
             ZStack {
                 Circle()
@@ -97,7 +99,7 @@ struct AdminUserDetailView: View {
                     .foregroundStyle(theme.onAccent)
             }
             VStack(alignment: .leading, spacing: 5) {
-                Text(variant.day(at: session.dayIndex).map { t($0.titleKey) } ?? t("day.n", session.dayIndex))
+                Text(days.first { $0.index == session.dayIndex }.map { t($0.titleKey) } ?? t("day.n", session.dayIndex))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(theme.text)
                 Text(AdminFormat.date(session.date, time: true))

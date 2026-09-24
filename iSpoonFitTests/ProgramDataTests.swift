@@ -16,7 +16,7 @@ final class ProgramDataTests: XCTestCase {
     func testEveryWeekHasFourDays() {
         for week in 1...ProgramData.totalWeeks {
             XCTAssertEqual(
-                ProgramData.days(inWeek: week).count,
+                ProgramData.days.filter { $0.week == week }.count,
                 ProgramData.daysPerWeek,
                 "Week \(week) should have four days"
             )
@@ -77,16 +77,11 @@ final class ProgramDataTests: XCTestCase {
     }
 
     func testFinalDayIsTheChallenge() {
-        let last = ProgramData.day(at: 28)
+        let last = ProgramData.days.first(where: { $0.index == 28 })
         XCTAssertNotNil(last)
         XCTAssertEqual(last?.titleKey, "day.finalChallenge")
         XCTAssertEqual(last?.isFinalDay, true)
-        XCTAssertEqual(ProgramData.day(at: 27)?.isFinalDay, false)
-    }
-
-    func testDayLookupRejectsOutOfRangeIndices() {
-        XCTAssertNil(ProgramData.day(at: 0))
-        XCTAssertNil(ProgramData.day(at: 29))
+        XCTAssertEqual(ProgramData.days.first(where: { $0.index == 27 })?.isFinalDay, false)
     }
 
     func testOnlyTheIntendedDaysCarryLoad() {

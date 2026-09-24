@@ -31,11 +31,6 @@ enum ProgramVariant: String, CaseIterable, Identifiable {
         }
     }
 
-    func day(at index: Int, profile: HealthProfile? = nil) -> ProgramDay? {
-        let all = days(profile: profile)
-        guard index >= 1, index <= all.count else { return nil }
-        return all[index - 1]
-    }
 
     // MARK: - Ana's challenge
 

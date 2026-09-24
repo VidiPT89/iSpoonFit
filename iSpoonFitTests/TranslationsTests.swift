@@ -215,7 +215,7 @@ final class TranslationsTests: XCTestCase {
         let original = manager.current
         defer { manager.current = original }
 
-        guard let day = ProgramData.day(at: 13) else { return XCTFail("Day 13 should exist") }
+        guard let day = ProgramData.days.first(where: { $0.index == 13 }) else { return XCTFail("Day 13 should exist") }
         for language in Lang.allCases {
             manager.current = language
             let text = PlanTextExporter.text(for: day)

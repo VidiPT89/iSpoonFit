@@ -5,14 +5,16 @@ import Foundation
 /// (and tested) without any UI.
 enum SessionBuilder {
     /// Timing for one day, after the low-energy adjustment: one round fewer
-    /// (never below two), ten seconds off the work and ten onto the rest.
+    /// (never below one), ten seconds off the work (never below 15) and ten
+    /// onto the rest. Care plans already start at two rounds of 20 seconds, so
+    /// the floor has to sit below that for the mode to change anything.
     static func params(for day: ProgramDay, lowEnergy: Bool) -> WeekParams {
         let base = day.params
         guard lowEnergy else { return base }
         return WeekParams(
-            work: max(20, base.work - 10),
+            work: max(15, base.work - 10),
             rest: base.rest + 10,
-            rounds: max(2, base.rounds - 1),
+            rounds: max(1, base.rounds - 1),
             phaseKey: base.phaseKey
         )
     }
