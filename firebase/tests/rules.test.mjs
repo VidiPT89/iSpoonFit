@@ -16,8 +16,9 @@ await env.withSecurityRulesDisabled(async (c) => {
   await setDoc(doc(db, 'users/other/sessions/s1'), { dayIndex: 1, date: 1 });
 });
 
-const admin = env.authenticatedContext('david', { email: 'damartins89@gmail.com', email_verified: true }).firestore();
-const fakeAdmin = env.authenticatedContext('evil', { email: 'damartins89@gmail.com', email_verified: false }).firestore();
+const admin = env.authenticatedContext('vidi', { email: 'ividi.dev@gmail.com', email_verified: true }).firestore();
+const fakeAdmin = env.authenticatedContext('evil', { email: 'ividi.dev@gmail.com', email_verified: false }).firestore();
+const oldAdmin = env.authenticatedContext('david', { email: 'damartins89@gmail.com', email_verified: true }).firestore();
 const ana = env.authenticatedContext('ana', { email: 'AnaCatarinaSVeiga@gmail.com', email_verified: true }).firestore();
 const bob = env.authenticatedContext('bob', { email: 'bob@mail.pt', email_verified: true }).firestore();
 const anon = env.unauthenticatedContext().firestore();
@@ -54,6 +55,7 @@ await check('admin writes invite', assertSucceeds(setDoc(doc(admin, 'invites/new
 await check('admin deletes invite', assertSucceeds(deleteDoc(doc(admin, 'invites/new@mail.pt'))));
 await check('admin cannot write others sessions', assertFails(setDoc(doc(admin, 'users/other/sessions/z'), { dayIndex: 2 })));
 await check('unverified admin email is not admin', assertFails(getDocs(collection(fakeAdmin, 'users'))));
+await check('previous admin email is no longer admin', assertFails(getDocs(collection(oldAdmin, 'users'))));
 
 await env.cleanup();
 console.log(`\n${ok} passed, ${bad} failed`);

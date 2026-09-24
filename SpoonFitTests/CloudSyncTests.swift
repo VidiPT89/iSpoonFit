@@ -184,8 +184,10 @@ final class CloudSyncTests: XCTestCase {
     }
 
     func testOnlyTheVerifiedAdminEmailIsAdmin() {
-        let admin = AccountUser(uid: "a", name: "David", email: "DaMartins89@gmail.com", providerIDs: ["google.com"], isEmailVerified: true)
+        let admin = AccountUser(uid: "a", name: "Vidi", email: "iVidi.dev@gmail.com", providerIDs: ["google.com"], isEmailVerified: true)
         XCTAssertTrue(admin.isAdmin)
+        let personal = AccountUser(uid: "c", name: "David", email: "damartins89@gmail.com", providerIDs: ["google.com"], isEmailVerified: true)
+        XCTAssertFalse(personal.isAdmin)
         let unverified = AccountUser(uid: "a", name: nil, email: AdminPolicy.email, providerIDs: ["password"], isEmailVerified: false)
         XCTAssertFalse(unverified.isAdmin)
         let ana = AccountUser(uid: "b", name: "Ana", email: "anacatarinasveiga@gmail.com", providerIDs: ["password"], isEmailVerified: true)

@@ -19,7 +19,7 @@ service cloud.firestore {
     function isAdmin() {
       return signedIn()
         && request.auth.token.email != null
-        && email() == 'damartins89@gmail.com'
+        && email() == 'ividi.dev@gmail.com'
         && request.auth.token.email_verified == true;
     }
 
