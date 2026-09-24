@@ -216,6 +216,50 @@ final class CloudSyncTests: XCTestCase {
         XCTAssertEqual(RemoteState(fields: stateNumbers), state)
     }
 
+    /// Mirrors `validProfile` and `validSession` in firebase/firestore.rules:
+    /// if the app ever sends a field the rules do not allow, every write fails.
+    func testRecordsOnlyUseFieldsTheSecurityRulesAccept() {
+        let profileFields: Set<String> = [
+            "name", "email", "programID", "startDate", "reminderEnabled",
+            "reminderTime", "medicalClearance", "updatedAt"
+        ]
+        let sessionFields: Set<String> = [
+            "dayIndex", "date", "durationSeconds", "lowEnergy", "energy", "discomfort", "note"
+        ]
+        let state = RemoteState(
+            startDate: Date(), reminderEnabled: true, reminderTime: Date(),
+            medicalClearance: true, updatedAt: Date()
+        )
+        XCTAssertTrue(Set(state.fields.keys).isSubset(of: profileFields))
+        XCTAssertNil(state.fields["programID"], "Only the admin or an invite sets the program")
+
+        let session = RemoteSession(
+            id: "x", dayIndex: 1, date: Date(), durationSeconds: 1, lowEnergy: false,
+            energy: 1, discomfort: 0, note: "n"
+        )
+        XCTAssertTrue(Set(session.fields.keys).isSubset(of: sessionFields))
+        XCTAssertTrue(session.fields["dayIndex"] is Int)
+        XCTAssertLessThanOrEqual(SessionCompleteView.noteLimit, 500)
+    }
+
+    func testTimeoutGivesUpOnWorkThatNeverStops() async {
+        let start = Date()
+        do {
+            _ = try await withTimeout(.milliseconds(200)) {
+                // Ignores cancellation, like the database SDK does.
+                try? await Task.sleep(for: .seconds(5))
+                return 1
+            }
+            XCTFail("Should have timed out")
+        } catch {
+            XCTAssertTrue(error is CancellationError)
+        }
+        XCTAssertLessThan(Date().timeIntervalSince(start), 2)
+
+        let value = try? await withTimeout(.seconds(2)) { 42 }
+        XCTAssertEqual(value, 42)
+    }
+
     func testMalformedCloudRecordsAreIgnored() {
         XCTAssertNil(RemoteSession(id: "x", fields: ["dayIndex": NSNumber(value: 99), "date": NSNumber(value: 1)]))
         XCTAssertNil(RemoteSession(id: "x", fields: ["dayIndex": NSNumber(value: 3)]))

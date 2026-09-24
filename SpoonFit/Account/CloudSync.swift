@@ -33,6 +33,10 @@ final class FirestoreCloudSync: CloudSyncing {
     }
 
     func claimProfile(name: String?, email: String?) async throws {
+        try await withTimeout(fetchTimeout) { try await self.claim(name: name, email: email) }
+    }
+
+    private func claim(name: String?, email: String?) async throws {
         let email = email?.lowercased()
         var fields: [String: Any] = [:]
         if let name { fields["name"] = name }
@@ -53,20 +57,14 @@ final class FirestoreCloudSync: CloudSyncing {
             (existing.get(key) as? String) != (value as? String)
         }
         guard !fields.isEmpty else { return }
-        try await userDocument.setData(fields, merge: true)
+        // Not awaited: offline, the write waits in the local cache until the
+        // connection returns, and the next read already sees it.
+        let document = userDocument
+        Task { try? await document.setData(fields, merge: true) }
     }
 
     func fetch() async throws -> CloudSnapshot {
-        try await withThrowingTaskGroup(of: CloudSnapshot.self) { group in
-            group.addTask { try await self.load() }
-            group.addTask {
-                try await Task.sleep(for: self.fetchTimeout)
-                throw CancellationError()
-            }
-            let first = try await group.next()!
-            group.cancelAll()
-            return first
-        }
+        try await withTimeout(fetchTimeout) { try await self.load() }
     }
 
     private func load() async throws -> CloudSnapshot {
@@ -93,12 +91,17 @@ final class FirestoreCloudSync: CloudSyncing {
         try await sessions.document(id).delete()
     }
 
+    /// Must reach the server: the account is deleted right after, so a write
+    /// left queued offline would never be allowed through. Gives up instead
+    /// of waiting forever when there is no connection.
     func deleteEverything() async throws {
-        let batch = Firestore.firestore().batch()
-        for document in try await sessions.getDocuments().documents {
-            batch.deleteDocument(document.reference)
+        try await withTimeout(.seconds(20)) {
+            let batch = Firestore.firestore().batch()
+            for document in try await self.sessions.getDocuments(source: .server).documents {
+                batch.deleteDocument(document.reference)
+            }
+            batch.deleteDocument(self.userDocument)
+            try await batch.commit()
         }
-        batch.deleteDocument(userDocument)
-        try await batch.commit()
     }
 }

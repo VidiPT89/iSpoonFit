@@ -252,7 +252,12 @@ final class AuthService {
         }
         var deleted = false
         await run {
-            try await removeData()
+            do {
+                try await removeData()
+            } catch {
+                // Nothing was deleted; most often there is no connection.
+                throw AuthFailure.cloudUnreachable
+            }
             try await user.delete()
             GIDSignIn.sharedInstance.signOut()
             deleted = true
@@ -263,6 +268,10 @@ final class AuthService {
     // MARK: - Helpers
 
     private func run(_ work: () async throws -> Void) async {
+        // Verification and password emails go out in the app's language.
+        if FirebaseSetup.isConfigured {
+            Auth.auth().languageCode = LocalizationManager.shared.current == .pt ? "pt-PT" : "en"
+        }
         errorKey = nil
         noticeKey = nil
         isWorking = true
@@ -281,6 +290,10 @@ final class AuthService {
            nsError.code == ASAuthorizationError.canceled.rawValue { return }
         if nsError.domain == kGIDSignInErrorDomain,
            nsError.code == GIDSignInError.canceled.rawValue { return }
+        if case AuthFailure.cloudUnreachable = error {
+            errorKey = "auth.error.network"
+            return
+        }
         errorKey = Self.messageKey(for: nsError)
     }
 
@@ -336,4 +349,5 @@ final class AuthService {
 
 private enum AuthFailure: Error {
     case missingToken
+    case cloudUnreachable
 }

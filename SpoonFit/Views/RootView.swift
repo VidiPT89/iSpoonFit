@@ -87,6 +87,8 @@ struct RootView: View {
         isSyncing = true
         let newSession = UserSession(user: user, syncsToCloud: user != .localGuest)
         await newSession.viewModel.synchronize()
+        // Signed out, or switched account, while the sync was running.
+        guard !Task.isCancelled else { return }
         newSession.viewModel.rescheduleReminderIfNeeded()
         session = newSession
         isSyncing = false

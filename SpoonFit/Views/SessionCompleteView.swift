@@ -51,8 +51,11 @@ struct SessionCompleteView: View {
         }
     }
 
+    /// Matches the limit enforced by the database rules.
+    static let noteLimit = 500
+
     private func finish(showProgram: Bool) {
-        let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = String(note.trimmingCharacters(in: .whitespacesAndNewlines).prefix(Self.noteLimit))
         onFinish(energy, discomfort, trimmed.isEmpty ? nil : trimmed, showProgram)
     }
 
@@ -156,6 +159,9 @@ struct SessionCompleteView: View {
                 TextField(t("checkin.notePlaceholder"), text: $note, axis: .vertical)
                     .font(.subheadline)
                     .lineLimit(1...3)
+                    .onChange(of: note) { _, value in
+                        if value.count > Self.noteLimit { note = String(value.prefix(Self.noteLimit)) }
+                    }
                     .padding(11)
                     .background(
                         RoundedRectangle(cornerRadius: 12, style: .continuous)

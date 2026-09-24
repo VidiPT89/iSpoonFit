@@ -39,20 +39,46 @@ service cloud.firestore {
         && request.resource.data.programID == get(invitePath()).data.programID;
     }
 
+    // What an account document may hold, as written by the app.
+    function validProfile(data) {
+      return data.keys().hasOnly([
+          'name', 'email', 'programID', 'startDate', 'reminderEnabled',
+          'reminderTime', 'medicalClearance', 'updatedAt'])
+        && (!('name' in data) || (data.name is string && data.name.size() <= 100))
+        && (!('programID' in data) || data.programID in ['standard', 'anaChallenge']);
+    }
+
+    // The email shown in the admin panel has to be the one the owner signed
+    // in with.
+    function ownEmail(data) {
+      return !('email' in data) || data.email == email();
+    }
+
+    // One finished workout, as written by the app.
+    function validSession(data) {
+      return data.keys().hasOnly([
+          'dayIndex', 'date', 'durationSeconds', 'lowEnergy', 'energy', 'discomfort', 'note'])
+        && data.dayIndex is int && data.dayIndex >= 1 && data.dayIndex <= 28
+        && data.date is number
+        && (!('note' in data) || (data.note is string && data.note.size() <= 500));
+    }
+
     match /users/{uid} {
       allow read: if isOwner(uid) || isAdmin();
-      allow create: if isAdmin()
-        || (isOwner(uid) && (!('programID' in request.resource.data) || takesInvitedProgram()));
-      allow update: if isAdmin()
-        || (isOwner(uid) && (
+      allow create: if validProfile(request.resource.data) && (isAdmin()
+        || (isOwner(uid) && ownEmail(request.resource.data)
+          && (!('programID' in request.resource.data) || takesInvitedProgram())));
+      allow update: if validProfile(request.resource.data) && (isAdmin()
+        || (isOwner(uid) && ownEmail(request.resource.data) && (
           !request.resource.data.diff(resource.data).affectedKeys().hasAny(['programID'])
           || (!('programID' in resource.data) && takesInvitedProgram())
-        ));
+        )));
       allow delete: if isOwner(uid);
 
       match /sessions/{sessionID} {
         allow read: if isOwner(uid) || isAdmin();
-        allow write: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validSession(request.resource.data);
+        allow delete: if isOwner(uid);
       }
     }
 

@@ -7,6 +7,9 @@ import UIKit
 @MainActor
 final class AppleSignInRequest: NSObject {
     private var continuation: CheckedContinuation<ASAuthorization, Error>?
+    /// Held for the whole request: the controller does not keep itself
+    /// alive, and a released one never calls back.
+    private var controller: ASAuthorizationController?
 
     func perform(_ configure: (ASAuthorizationAppleIDRequest) -> Void) async throws -> ASAuthorization {
         let request = ASAuthorizationAppleIDProvider().createRequest()
@@ -14,6 +17,8 @@ final class AppleSignInRequest: NSObject {
         let controller = ASAuthorizationController(authorizationRequests: [request])
         controller.delegate = self
         controller.presentationContextProvider = self
+        self.controller = controller
+        defer { self.controller = nil }
         return try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
             controller.performRequests()
