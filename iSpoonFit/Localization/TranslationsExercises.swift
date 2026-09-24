@@ -50,6 +50,8 @@ extension Translations {
         "muscle.transverseAbdominis": [.pt: "Transverso do abdómen", .en: "Transverse abdominis"],
         "muscle.pelvicFloor": [.pt: "Pavimento pélvico", .en: "Pelvic floor"],
         "muscle.spine": [.pt: "Coluna", .en: "Spine"],
-        "muscle.chest": [.pt: "Peito", .en: "Chest"]
+        "muscle.chest": [.pt: "Peito", .en: "Chest"],
+        "muscle.neck": [.pt: "Pescoço", .en: "Neck"],
+        "muscle.diaphragm": [.pt: "Diafragma", .en: "Diaphragm"]
     ]
 }

@@ -69,15 +69,15 @@ extension Translations {
         ],
 
         // MARK: Programs
-        "variant.standard": [.pt: "iSpoonFit 28", .en: "iSpoonFit 28"],
-        "variant.standard.desc": [
-            .pt: "O programa da app: os mesmos quatro alongamentos, 2 minutos, todos os dias.",
-            .en: "The app's program: the same four stretches, 2 minutes, every day."
+        "variant.personalized": [.pt: "Plano personalizado", .en: "Personalized plan"],
+        "variant.personalized.desc": [
+            .pt: "Gerado pela app a partir do questionário de saúde de cada pessoa.",
+            .en: "Built by the app from each person's health questionnaire."
         ],
         "variant.anaChallenge": [.pt: "Desafio 28 dias da Ana", .en: "Ana's 28-day challenge"],
         "variant.anaChallenge.desc": [
-            .pt: "Os mesmos treinos, com os alongamentos exatamente como no plano da Ana: dois alongamentos próprios por dia na semana 1 e 30 s por lado a partir do dia 5.",
-            .en: "The same workouts, with the stretches exactly as in Ana's plan: two stretches of its own each day in week 1 and 30 s per side from day 5."
+            .pt: "Plano fixo, exatamente como a Ana o definiu: 28 treinos em 7 semanas, com os alongamentos do plano original.",
+            .en: "A fixed plan, exactly as Ana defined it: 28 workouts over 7 weeks, with the stretches from the original plan."
         ],
 
         // MARK: Admin

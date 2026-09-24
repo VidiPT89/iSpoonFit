@@ -41,7 +41,7 @@ enum Modifier: String, Codable, CaseIterable {
 }
 
 enum ExerciseCategory: String, Codable, CaseIterable, Identifiable {
-    case warmup, legsGlutes, core, stretch
+    case warmup, mobility, legsGlutes, core, upperBody, balance, stretch
 
     var id: String { rawValue }
     var titleKey: String { "category.\(rawValue)" }
@@ -49,7 +49,10 @@ enum ExerciseCategory: String, Codable, CaseIterable, Identifiable {
     var icon: String {
         switch self {
         case .warmup: return "sunrise.fill"
+        case .mobility: return "wind"
         case .legsGlutes: return "figure.strengthtraining.functional"
+        case .upperBody: return "figure.arms.open"
+        case .balance: return "figure.stand"
         case .core: return "figure.core.training"
         case .stretch: return "figure.flexibility"
         }
@@ -63,6 +66,9 @@ enum ExerciseID: String, Codable, CaseIterable, Identifiable {
     case sumoSquat, squat, shortLunge, alternatingLunge, wallSit, calfRaise, sideLegRaise
     case gluteBridge, marchingBridge, birdDog, deadBug, heelTaps, pelvicTilt
     case childsPose, figureFour, quadStretch, hamstringStretch, hipFlexorStretch, sideStretch
+    // Care exercises: seated, chair-supported or against a wall.
+    case seatedMarch, seatedKneeExtension, sitToStand, wallPushUp, shoulderRolls
+    case diaphragmaticBreathing, seatedCatCow, seatedRotation, supportedBalance, standingHipAbduction
 
     var id: String { rawValue }
 
@@ -129,9 +135,9 @@ struct WeekParams: Hashable {
     var phaseDescriptionKey: String { phaseKey + ".desc" }
 }
 
-/// One stretch in the closing block and how long it is held. Unilateral
-/// stretches split the time between both sides.
-struct CooldownStep: Hashable {
+/// One exercise of the warm-up or the closing stretches and how long it
+/// lasts. Unilateral moves split the time between both sides.
+struct TimedStep: Hashable {
     let ref: ExerciseRef
     let seconds: Int
 }
@@ -140,9 +146,13 @@ struct ProgramDay: Identifiable, Hashable {
     let index: Int
     let titleKey: String
     let exercises: [ExerciseRef]
-    /// The closing stretches. Most days use the standard routine; a program
-    /// can give a day its own.
-    var cooldown: [CooldownStep] = ProgramData.cooldown
+    /// The opening moves. Fixed plans use the shared routine; a generated
+    /// plan picks moves that suit the person.
+    var warmup: [TimedStep] = ProgramData.warmupSteps
+    /// The closing stretches, shared or chosen per day in the same way.
+    var cooldown: [TimedStep] = ProgramData.cooldown
+    /// Work, rest and rounds when the plan sets its own; otherwise the week's.
+    var paramsOverride: WeekParams? = nil
 
     var id: Int { index }
 
@@ -156,7 +166,7 @@ struct ProgramDay: Identifiable, Hashable {
         ["weekday.mon", "weekday.tue", "weekday.wed", "weekday.thu"][weekday]
     }
 
-    var params: WeekParams { ProgramData.params(forWeek: week) }
+    var params: WeekParams { paramsOverride ?? ProgramData.params(forWeek: week) }
 
     var isFinalDay: Bool { index == ProgramData.totalDays }
 

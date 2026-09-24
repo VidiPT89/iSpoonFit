@@ -13,7 +13,11 @@ final class ProgramState {
     var updatedAt: Date = Date.now
     /// The program variant this account follows. Only the admin (or an
     /// invite) sets it; the app just reads it from the cloud.
-    var programID: String = ProgramVariant.standard.rawValue
+    var programID: String = ProgramVariant.personalized.rawValue
+    /// The start-up questionnaire as JSON (`HealthProfile`), and when it was
+    /// last answered. Synced to a private document only the owner can read.
+    var healthProfileJSON: String? = nil
+    var healthUpdatedAt: Date? = nil
 
     init(
         startDate: Date,

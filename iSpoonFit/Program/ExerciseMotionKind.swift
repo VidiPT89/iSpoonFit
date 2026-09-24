@@ -20,6 +20,18 @@ enum ExerciseMotionKind: String, CaseIterable {
     case hipFlexorStretch
     case sideStretch
 
+    // Seated or supported
+    case seatedMarch
+    case seatedKneeExtension
+    case sitToStand
+    case wallPushUp
+    case shoulderRoll
+    case breathing
+    case seatedCatCow
+    case seatedRotation
+    case supportedBalance
+    case standingHipAbduction
+
     // On the floor
     case sideLegRaise
     case bridge
@@ -38,7 +50,9 @@ enum ExerciseMotionKind: String, CaseIterable {
         switch self {
         case .marchInPlace, .gentleSquat, .squat, .sumoSquat, .pulseSquat, .hipCircle,
              .armSwing, .shortLunge, .lunge, .wallSit, .calfRaise, .quadStretch,
-             .hipFlexorStretch, .sideStretch:
+             .hipFlexorStretch, .sideStretch, .seatedMarch, .seatedKneeExtension, .sitToStand,
+             .wallPushUp, .shoulderRoll, .breathing, .seatedCatCow, .seatedRotation,
+             .supportedBalance, .standingHipAbduction:
             return false
         default:
             return true
@@ -50,8 +64,10 @@ enum ExerciseMotionKind: String, CaseIterable {
 
     var prop: ExerciseProp? {
         switch self {
-        case .wallSit: return .wall
-        case .calfRaise, .shortLunge, .lunge, .quadStretch: return .chair
+        case .wallSit, .wallPushUp: return .wall
+        case .calfRaise, .shortLunge, .lunge, .quadStretch, .supportedBalance, .standingHipAbduction: return .chair
+        case .seatedMarch, .seatedKneeExtension, .sitToStand, .shoulderRoll, .breathing, .seatedCatCow: return .seat
+        case .seatedRotation: return .seatFront
         case .hamstringStretch: return .towel
         default: return nil
         }
@@ -61,7 +77,7 @@ enum ExerciseMotionKind: String, CaseIterable {
     /// for the breath the instructions ask for.
     var hasBreathingGlow: Bool {
         switch self {
-        case .wallSit, .childsPose: return true
+        case .wallSit, .childsPose, .breathing: return true
         default: return false
         }
     }
@@ -71,7 +87,10 @@ enum ExerciseMotionKind: String, CaseIterable {
         case .pulseSquat: return 0.6
         case .wallSit, .childsPose: return 4.0
         case .hipCircle: return 3.0
-        case .hipFlexorStretch, .sideStretch: return 4.0
+        case .hipFlexorStretch, .sideStretch, .seatedCatCow, .seatedRotation: return 4.0
+        case .breathing: return 6.0
+        case .sitToStand, .wallPushUp, .shoulderRoll: return 3.0
+        case .seatedMarch: return 1.6
         case .marchInPlace: return 1.2
         default: return 2.0
         }
@@ -83,4 +102,8 @@ enum ExerciseProp {
     case chair
     case wall
     case towel
+    /// A chair seen from the side, with the figure sitting on it.
+    case seat
+    /// A chair seen from the front, with the figure sitting on it.
+    case seatFront
 }

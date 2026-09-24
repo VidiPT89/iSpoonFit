@@ -125,6 +125,58 @@ enum ExerciseCatalog {
             id: .sideStretch, nameKey: "stretch.side", category: .stretch,
             motion: .sideStretch, isUnilateral: true, isAlternating: false,
             muscleKeys: ["muscle.obliques", "muscle.lowerBack"]
+        ),
+
+        // MARK: Care: seated, chair-supported or against a wall
+        Exercise(
+            id: .seatedMarch, nameKey: "exercise.seatedMarch", category: .mobility,
+            motion: .seatedMarch, isUnilateral: false, isAlternating: true,
+            muscleKeys: ["muscle.hipFlexors", "muscle.core"]
+        ),
+        Exercise(
+            id: .seatedKneeExtension, nameKey: "exercise.seatedKneeExtension", category: .legsGlutes,
+            motion: .seatedKneeExtension, isUnilateral: false, isAlternating: true,
+            muscleKeys: ["muscle.quads"]
+        ),
+        Exercise(
+            id: .sitToStand, nameKey: "exercise.sitToStand", category: .legsGlutes,
+            motion: .sitToStand, isUnilateral: false, isAlternating: false,
+            muscleKeys: ["muscle.quads", "muscle.glutes"]
+        ),
+        Exercise(
+            id: .wallPushUp, nameKey: "exercise.wallPushUp", category: .upperBody,
+            motion: .wallPushUp, isUnilateral: false, isAlternating: false,
+            muscleKeys: ["muscle.chest", "muscle.shoulders"]
+        ),
+        Exercise(
+            id: .shoulderRolls, nameKey: "exercise.shoulderRolls", category: .mobility,
+            motion: .shoulderRoll, isUnilateral: false, isAlternating: false,
+            muscleKeys: ["muscle.shoulders", "muscle.neck"]
+        ),
+        Exercise(
+            id: .diaphragmaticBreathing, nameKey: "exercise.diaphragmaticBreathing", category: .mobility,
+            motion: .breathing, isUnilateral: false, isAlternating: false,
+            muscleKeys: ["muscle.diaphragm", "muscle.deepCore"]
+        ),
+        Exercise(
+            id: .seatedCatCow, nameKey: "exercise.seatedCatCow", category: .mobility,
+            motion: .seatedCatCow, isUnilateral: false, isAlternating: false,
+            muscleKeys: ["muscle.spine", "muscle.lowerBack"]
+        ),
+        Exercise(
+            id: .seatedRotation, nameKey: "exercise.seatedRotation", category: .mobility,
+            motion: .seatedRotation, isUnilateral: false, isAlternating: true,
+            muscleKeys: ["muscle.spine", "muscle.obliques"]
+        ),
+        Exercise(
+            id: .supportedBalance, nameKey: "exercise.supportedBalance", category: .balance,
+            motion: .supportedBalance, isUnilateral: true, isAlternating: false,
+            muscleKeys: ["muscle.calves", "muscle.gluteMedius"]
+        ),
+        Exercise(
+            id: .standingHipAbduction, nameKey: "exercise.standingHipAbduction", category: .balance,
+            motion: .standingHipAbduction, isUnilateral: true, isAlternating: false,
+            muscleKeys: ["muscle.gluteMedius", "muscle.abductors"]
         )
     ]
 

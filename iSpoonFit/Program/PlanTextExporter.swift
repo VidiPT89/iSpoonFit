@@ -18,8 +18,8 @@ enum PlanTextExporter {
         lines.append("")
 
         lines.append(t("block.warmup"))
-        for exercise in ProgramData.warmup {
-            lines.append("· \(exercise.displayName) — \(ProgramData.warmupSeconds)s")
+        for entry in day.warmup {
+            lines.append("· \(entry.ref.displayName) — \(entry.seconds)s")
         }
         lines.append("")
 
@@ -40,8 +40,9 @@ enum PlanTextExporter {
         return lines.joined(separator: "\n")
     }
 
-    static func text(forWeek week: Int, variant: ProgramVariant = .standard) -> String {
-        let params = ProgramData.params(forWeek: week)
+    /// `days` are the week's days from the account's own plan.
+    static func text(forWeek week: Int, days: [ProgramDay]) -> String {
+        let params = days.first?.params ?? ProgramData.params(forWeek: week)
         var lines: [String] = []
 
         lines.append("\(t("app.name")) · \(t("week.n", week))")
@@ -49,7 +50,7 @@ enum PlanTextExporter {
         lines.append("\(t("params.work")) \(params.work)s · \(t("params.rest")) \(params.rest)s · \(t("params.rounds")) \(params.rounds)")
         lines.append("")
 
-        for day in variant.days(inWeek: week) {
+        for day in days {
             lines.append("\(t(day.weekdayKey)) · \(t("day.n", day.index)) — \(t(day.titleKey))")
             for exercise in day.exercises {
                 lines.append("   · \(exercise.displayName)")

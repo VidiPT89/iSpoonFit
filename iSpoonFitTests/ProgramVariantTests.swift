@@ -14,8 +14,8 @@ final class ProgramVariantTests: XCTestCase {
     }
 
     func testWorkoutsAreTheSameAsTheStandardProgram() {
-        XCTAssertEqual(ana.days.count, 28)
-        for (mine, standard) in zip(ana.days, ProgramVariant.standard.days) {
+        XCTAssertEqual(ana.days(profile: nil).count, 28)
+        for (mine, standard) in zip(ana.days(profile: nil), ProgramData.days) {
             XCTAssertEqual(mine.index, standard.index)
             XCTAssertEqual(mine.titleKey, standard.titleKey)
             XCTAssertEqual(mine.exercises, standard.exercises, "Day \(mine.index)")
@@ -52,15 +52,16 @@ final class ProgramVariantTests: XCTestCase {
         XCTAssertEqual(hipFlexor?.switchSideAtSecond, 30)
     }
 
-    func testTheStandardProgramKeepsItsTwoMinuteRoutine() {
-        for day in ProgramVariant.standard.days {
+    func testTheSourceProgramKeepsItsTwoMinuteRoutine() {
+        for day in ProgramData.days {
             XCTAssertEqual(day.cooldown, ProgramData.cooldown)
         }
     }
 
-    func testUnknownProgramIDsFallBackToStandard() {
-        XCTAssertEqual(ProgramVariant(id: nil), .standard)
-        XCTAssertEqual(ProgramVariant(id: "something-else"), .standard)
+    func testUnknownProgramIDsFallBackToPersonalized() {
+        XCTAssertEqual(ProgramVariant(id: nil), .personalized)
+        XCTAssertEqual(ProgramVariant(id: "standard"), .personalized)
+        XCTAssertEqual(ProgramVariant(id: "something-else"), .personalized)
         XCTAssertEqual(ProgramVariant(id: "anaChallenge"), .anaChallenge)
     }
 }

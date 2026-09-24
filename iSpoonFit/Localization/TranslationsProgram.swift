@@ -152,8 +152,8 @@ extension Translations {
         // MARK: Reminders and sharing
         "reminder.title": [.pt: "iSpoonFit", .en: "iSpoonFit"],
         "reminder.body": [
-            .pt: "O teu treino de 20 minutos está à tua espera 🧡",
-            .en: "Your 20-minute workout is waiting for you 🧡"
+            .pt: "A tua sessão de cuidado está à tua espera 🧡",
+            .en: "Your care session is waiting for you 🧡"
         ],
         "share.weekTitle": [.pt: "Partilhar a semana", .en: "Share this week"],
         "share.footer": [.pt: "iSpoonFit · ividi.dev", .en: "iSpoonFit · ividi.dev"]

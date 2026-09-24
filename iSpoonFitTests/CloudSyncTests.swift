@@ -12,6 +12,7 @@ private final class FakeCloud: CloudSyncing {
     var programID: String?
     var invitedProgramID: String?
     var profileName: String?
+    var health: RemoteHealth?
 
     func claimProfile(name: String?, email: String?) async throws {
         guard isReachable else { throw URLError(.notConnectedToInternet) }
@@ -21,16 +22,18 @@ private final class FakeCloud: CloudSyncing {
 
     func fetch() async throws -> CloudSnapshot {
         guard isReachable else { throw URLError(.notConnectedToInternet) }
-        return CloudSnapshot(state: state, sessions: Array(sessions.values), programID: programID)
+        return CloudSnapshot(state: state, sessions: Array(sessions.values), programID: programID, health: health)
     }
 
     func save(state: RemoteState) async throws { self.state = state }
     func save(session: RemoteSession) async throws { sessions[session.id] = session }
+    func save(health: RemoteHealth) async throws { self.health = health }
     func deleteSession(id: String) async throws { sessions[id] = nil }
 
     func deleteEverything() async throws {
         state = nil
         sessions = [:]
+        health = nil
     }
 }
 
@@ -176,7 +179,7 @@ final class CloudSyncTests: XCTestCase {
         let phone = try makeDevice(cloud)
         phone.startProgram(startDate: Date(), reminderTime: nil, medicalClearance: true)
         await phone.synchronize()
-        XCTAssertEqual(phone.variant, .standard)
+        XCTAssertEqual(phone.variant, .personalized)
 
         cloud.programID = ProgramVariant.anaChallenge.rawValue
         await phone.synchronize()

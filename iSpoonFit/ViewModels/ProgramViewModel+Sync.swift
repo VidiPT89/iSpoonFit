@@ -19,6 +19,7 @@ extension ProgramViewModel {
         mergeState(snapshot.state, into: context)
         mergeSessions(snapshot.sessions, into: context)
         applyAssignedProgram(snapshot.programID, in: context)
+        mergeHealth(snapshot.health, in: context)
 
         try? context.save()
         refresh()
@@ -57,6 +58,23 @@ extension ProgramViewModel {
         }
     }
 
+    /// Questionnaire answers: the side answered most recently wins.
+    private func mergeHealth(_ remote: RemoteHealth?, in context: ModelContext) {
+        guard let local = (try? context.fetch(FetchDescriptor<ProgramState>()))?.first else {
+            pendingHealthJSON = remote?.profile
+            return
+        }
+        switch (local.healthUpdatedAt, remote) {
+        case (_, let remote?) where local.healthUpdatedAt == nil || remote.updatedAt > local.healthUpdatedAt!:
+            local.healthProfileJSON = remote.profile
+            local.healthUpdatedAt = remote.updatedAt
+        case (let localDate?, let remote) where remote == nil || localDate > remote!.updatedAt:
+            pushHealth()
+        default:
+            break
+        }
+    }
+
     private func mergeSessions(_ remote: [RemoteSession], into context: ModelContext) {
         let remoteIDs = Set(remote.map(\.id))
         let localIDs = Set(sessions.map(\.uuid))
@@ -92,6 +110,12 @@ extension ProgramViewModel {
         guard let sync, let state else { return }
         let record = RemoteState(state)
         Task { try? await sync.save(state: record) }
+    }
+
+    func pushHealth() {
+        guard let sync, let json = state?.healthProfileJSON, let date = state?.healthUpdatedAt else { return }
+        let record = RemoteHealth(profile: json, updatedAt: date)
+        Task { try? await sync.save(health: record) }
     }
 
     func push(_ session: CompletedSession) {

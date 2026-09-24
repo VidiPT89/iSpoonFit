@@ -101,11 +101,41 @@ struct CloudSnapshot: Equatable {
     /// Set by the admin or an invite, never written by the app itself, so it
     /// travels apart from the settings the user can change.
     var programID: String?
+    /// The questionnaire answers from the account's private document.
+    var health: RemoteHealth?
 
-    init(state: RemoteState?, sessions: [RemoteSession], programID: String? = nil) {
+    init(state: RemoteState?, sessions: [RemoteSession], programID: String? = nil, health: RemoteHealth? = nil) {
         self.state = state
         self.sessions = sessions
         self.programID = programID
+        self.health = health
+    }
+}
+
+/// The questionnaire answers, kept in `users/{uid}/private/health`, which
+/// only the owner can read: not even the admin sees health details.
+struct RemoteHealth: Equatable {
+    /// `HealthProfile` as JSON.
+    var profile: String
+    var updatedAt: Date
+
+    init(profile: String, updatedAt: Date) {
+        self.profile = profile
+        self.updatedAt = updatedAt
+    }
+
+    init?(fields: [String: Any]) {
+        guard let profile = fields["profile"] as? String,
+              profile.count <= 4000,
+              (try? HealthProfile(json: profile)) != nil,
+              let updatedAt = CloudField.date(fields["updatedAt"])
+        else { return nil }
+        self.profile = profile
+        self.updatedAt = updatedAt
+    }
+
+    var fields: [String: Any] {
+        ["profile": profile, "updatedAt": updatedAt.timeIntervalSince1970]
     }
 }
 

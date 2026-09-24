@@ -115,7 +115,7 @@ struct AdminView: View {
                     .foregroundStyle(theme.textFaint)
             }
             Spacer(minLength: 0)
-            if user.variant != .standard {
+            if user.variant.isFixed {
                 Image(systemName: "star.fill")
                     .font(.caption)
                     .foregroundStyle(theme.accent)
@@ -186,7 +186,7 @@ private struct AdminInviteForm: View {
     @Environment(\.dismiss) private var dismiss
     @State private var email = ""
     @State private var name = ""
-    @State private var variant: ProgramVariant = .standard
+    @State private var variant: ProgramVariant = .personalized
 
     let theme = Theme.shared
 

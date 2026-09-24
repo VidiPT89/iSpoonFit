@@ -37,11 +37,11 @@ enum SessionBuilder {
         }
 
         // Get ready, previewing the first warm-up move.
-        append(.getReady, .warmup, ProgramData.warmup[0], ProgramData.getReadySeconds)
+        append(.getReady, .warmup, day.warmup.first?.ref ?? ProgramData.warmup[0], ProgramData.getReadySeconds)
 
         // Warm-up runs straight through, no rest between moves.
-        for exercise in ProgramData.warmup {
-            append(.work, .warmup, exercise, ProgramData.warmupSeconds)
+        for entry in day.warmup {
+            append(.work, .warmup, entry.ref, entry.seconds)
         }
 
         // Circuit: every work interval is followed by a rest, except the very

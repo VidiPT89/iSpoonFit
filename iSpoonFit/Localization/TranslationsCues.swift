@@ -180,7 +180,7 @@ extension Translations {
 
         // MARK: Side-lying leg raise
         "cue.sideLegRaise.steps": [
-            .pt: "Deitada de lado, cabeça apoiada no braço, perna de baixo fletida. Sobe a perna de cima esticada, sem rodar a anca para trás.",
+            .pt: "Deita-te de lado, cabeça apoiada no braço, perna de baixo fletida. Sobe a perna de cima esticada, sem rodar a anca para trás.",
             .en: "Lying on your side, head resting on your arm, bottom leg bent. Lift your straight top leg without rolling your hips back."
         ],
         "cue.sideLegRaise.breathing": [

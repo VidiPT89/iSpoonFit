@@ -239,6 +239,33 @@ struct ExerciseDemoView: View {
             chair.addLine(to: CGPoint(x: right, y: groundY))
             context.stroke(chair, with: .color(color), style: StrokeStyle(lineWidth: lineWidth * 0.6, lineCap: .round))
 
+        case .seat:
+            // Side view: seat just under the hip, backrest behind the back.
+            var seat = Path()
+            let seatY = size.height * 0.63
+            let back = size.width * 0.33
+            let front = size.width * 0.56
+            seat.move(to: CGPoint(x: back, y: size.height * 0.36))
+            seat.addLine(to: CGPoint(x: back, y: groundY))
+            seat.move(to: CGPoint(x: back, y: seatY))
+            seat.addLine(to: CGPoint(x: front, y: seatY))
+            seat.addLine(to: CGPoint(x: front, y: groundY))
+            context.stroke(seat, with: .color(color), style: StrokeStyle(lineWidth: lineWidth * 0.6, lineCap: .round, lineJoin: .round))
+
+        case .seatFront:
+            // Front view: the seat edge and the two front legs.
+            var seat = Path()
+            let seatY = size.height * 0.63
+            let left = size.width * 0.36
+            let right = size.width * 0.64
+            seat.move(to: CGPoint(x: left, y: seatY))
+            seat.addLine(to: CGPoint(x: right, y: seatY))
+            seat.move(to: CGPoint(x: left + 0.01 * size.width, y: seatY))
+            seat.addLine(to: CGPoint(x: left + 0.01 * size.width, y: groundY))
+            seat.move(to: CGPoint(x: right - 0.01 * size.width, y: seatY))
+            seat.addLine(to: CGPoint(x: right - 0.01 * size.width, y: groundY))
+            context.stroke(seat, with: .color(color), style: StrokeStyle(lineWidth: lineWidth * 0.6, lineCap: .round))
+
         case .towel:
             var towel = Path()
             towel.move(to: point(pose.handL))

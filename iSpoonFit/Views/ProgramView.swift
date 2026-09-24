@@ -14,7 +14,9 @@ struct ProgramView: View {
                 VStack(spacing: 18) {
                     ScreenHeader(
                         titleKey: "tab.program",
-                        subtitle: viewModel.variant == .standard ? nil : t(viewModel.variant.titleKey)
+                        subtitle: viewModel.variant.isFixed
+                            ? t(viewModel.variant.titleKey)
+                            : t("tier.\(CarePlanGenerator.tier(for: viewModel.healthProfile ?? .empty))")
                     )
                         .padding(.top, 8)
 
@@ -86,7 +88,9 @@ struct ProgramView: View {
 
     // MARK: - Phase and parameters
 
-    private var params: WeekParams { ProgramData.params(forWeek: selectedWeek) }
+    private var params: WeekParams {
+        viewModel.days(inWeek: selectedWeek).first?.params ?? ProgramData.params(forWeek: selectedWeek)
+    }
 
     private var phaseCard: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -116,7 +120,7 @@ struct ProgramView: View {
             }
 
             Button {
-                shareText = SharePayload(text: PlanTextExporter.text(forWeek: selectedWeek, variant: viewModel.variant))
+                shareText = SharePayload(text: PlanTextExporter.text(forWeek: selectedWeek, days: viewModel.days(inWeek: selectedWeek)))
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "square.and.arrow.up")

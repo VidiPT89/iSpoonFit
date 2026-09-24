@@ -1,6 +1,6 @@
 # 🥄 iSpoonFit
 
-> A guided 28-session rebuild programme for iOS. Four days a week for seven weeks, 17 to 21 minutes a session, no gym and no equipment beyond a mat and a chair.
+> Gentle, caring exercise for people living with chronic conditions. A short health questionnaire shapes a personal 28-session plan: four days a week, 10 to 17 minutes, at home, with a chair and, if it suits you, a mat.
 
 [![Report Bug](https://img.shields.io/badge/Report-Bug-red)](https://github.com/VidiPT89/iSpoonFit/issues)
 [![Request Feature](https://img.shields.io/badge/Request-Feature-blue)](https://github.com/VidiPT89/iSpoonFit/issues)
@@ -10,13 +10,14 @@
 - ✅ Personal accounts: sign up with email and password, or continue with Apple, Google or Microsoft
 - ✅ One admin account with a private panel: every account's progress and check-ins, program assignment and profiles prepared ahead of time by email
 - ✅ Progress synced to your account with Cloud Firestore, so it follows you to any iPhone or iPad, and keeps working offline
-- ✅ A complete 28-session plan: seven weeks, four sessions per week, Monday to Thursday, across four phases of progression
-- ✅ 21 bodyweight exercises across warm-up, legs and glutes, core and stretching, each with its own animated demonstration
+- ✅ A health questionnaire at sign-up (conditions, limitations, energy, age, weight) that generates a personal 28-session care plan on the device
+- ✅ Plans that respect every answer: seated alternatives, no floor work when getting down is hard, no joint loads that hurt, supported balance only
+- ✅ Fixed plans the admin can assign instead, such as Ana's 28-day challenge, kept exactly as written
+- ✅ 33 exercises, including seated, chair-supported and wall-based care exercises, each with its own animated demonstration
 - ✅ Stick-figure animations drawn live with `Canvas` and `TimelineView`: every movement is generated from code, no video and no image assets
 - ✅ Guided session player with a date-anchored timer that never drifts, even if the screen locks mid-set
 - ✅ Spoken countdown, interval sounds and haptics, with a "switch sides" cue halfway through every unilateral exercise; your music keeps playing and only dips while the voice speaks
 - ✅ Low-energy mode: shorter work intervals, longer rests, one round fewer and no added load, decided per day
-- ✅ Water bottles as the only progression tool, introduced on the days where it matters
 - ✅ Progress tracking with a session history, weekly progress, total minutes and five unlockable achievements
 - ✅ Local workout reminders at the time and on the weekdays you choose (Monday to Thursday by default)
 - ✅ Exercise library with step-by-step instructions, breathing cues, common mistakes and an easier version of every movement
@@ -89,23 +90,29 @@ Language, appearance, sounds, voice, haptics, reminders and your account (sign o
 
 ## 🗓️ The Programme
 
-| Weeks | Work | Rest | Rounds | Phase |
-|-------|------|------|--------|-------|
-| 1 to 2 | 40s | 20s | 3 | Foundation |
-| 3 to 4 | 45s | 15s | 3 | Firming |
-| 5 to 6 | 45s | 15s | 4 | Endurance |
-| 7 | 50s | 10s | 4 | Consolidation |
+iSpoonFit is made for people living with chronic conditions: gentle, caring movement that adapts to the body and the energy of each person.
 
-Every session is built the same way: a fixed 3-minute warm-up, a circuit of the four exercises for that day, and a stretching block to close.
+### Personalized care plans
 
-Two versions of the programme share the same 28 workouts and differ only in the stretching:
+New accounts answer a short questionnaire during onboarding: age, weight and height, chronic conditions (fibromyalgia, ME/CFS, long COVID, POTS, arthritis, lupus, Behçet's, MS, Parkinson's, heart and lung conditions, osteoporosis, postpartum and more), physical limitations, typical energy and recent activity. Everything is optional and can be updated from Settings.
 
-| Programme | Stretching |
-|-----------|------------|
-| **iSpoonFit 28** (default) | The same four stretches every day, 2 minutes |
-| **Ana's 28-day challenge** | Week 1: two one-minute stretches chosen for each day, including hip flexors and a standing side stretch. Days 5 to 27: child's pose 30 s, then figure-4, quad and hamstring 30 s per side. Day 28: 2 minutes |
+From those answers, `CarePlanGenerator` builds 28 sessions on the device, with fixed, tested rules:
 
-New accounts start on the default. The admin can assign another programme from the admin panel, or ahead of time with a profile prepared for that email.
+| Answer | Effect on the plan |
+|--------|--------------------|
+| Activity, energy, age | Pace tier: very gentle (20 s work / 40 s rest), gentle or moderate, never more than 3 rounds or 45 s |
+| ME/CFS, long COVID, POTS | Always the gentlest tier; seated or lying down only |
+| Can't get down to the floor, Parkinson's, BMI ≥ 40 | No floor or kneeling exercises |
+| Knee, wrist or shoulder pain | Nothing that loads that joint |
+| Heart condition, asthma or COPD | No held efforts such as the wall sit |
+| Osteoporosis | No bending, twisting or end-of-range movement |
+| Dizziness, MS, age 75+ | Balance work only with both hands on the chair |
+
+Each week has four themes (mobility and breathing, gentle strength, core and breathing, balance and full body), with a gentle warm-up and a stretching and breathing close chosen to suit the person. Sessions last 10 to 17 minutes.
+
+### Fixed plans
+
+The admin can assign a fixed plan instead. **Ana's 28-day challenge** follows her written plan exactly: 28 workouts over seven weeks at 40/20 to 50/10 seconds, water bottles on the days where the plan uses them, and the stretches as written (two one-minute stretches per day in week 1, then 30 s per side).
 
 ## 🧪 Testing
 
@@ -114,7 +121,7 @@ xcodebuild -project iSpoonFit.xcodeproj -scheme iSpoonFit \
   -destination 'platform=iOS Simulator,name=iPhone 17' test
 ```
 
-84 tests cover the programme data and both programme versions, the session builder, the animation poses, the translations, the view models, the sign-in form, the admin role and the cloud sync merge rules.
+104 tests cover the care plan generator and every questionnaire rule, the programme data and Ana's plan, the session builder, the animation poses, the translations, the view models, the sign-in form, the admin role and the cloud sync merge rules.
 
 The Firestore security rules have their own tests against the local emulator (needs Java):
 

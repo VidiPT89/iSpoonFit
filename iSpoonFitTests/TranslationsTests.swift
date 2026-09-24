@@ -33,7 +33,9 @@ final class TranslationsTests: XCTestCase {
             Translations.exercises,
             Translations.standingCues,
             Translations.floorCues,
-            Translations.account
+            Translations.account,
+            Translations.care,
+            Translations.health
         ]
         let total = parts.reduce(0) { $0 + $1.count }
         XCTAssertEqual(

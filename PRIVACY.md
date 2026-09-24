@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**iSpoonFit** · Last updated: 23 September 2026
+**iSpoonFit** · Last updated: 24 September 2026
 
 iSpoonFit needs an account so your programme and progress follow you between devices. This policy explains what that account stores and nothing more.
 
@@ -8,9 +8,10 @@ iSpoonFit needs an account so your programme and progress follow you between dev
 
 - **Sign-in details:** your email address and name, or the identifier Apple, Google or Microsoft shares when you choose to continue with them. Passwords are handled by Firebase Authentication and never seen by the app.
 - **Your programme:** start date, reminder settings and your medical-clearance confirmation.
+- **Your health questionnaire (optional):** age, weight, height, the conditions and limitations you choose to tick, a free-text note, your typical energy and activity. It is used only on your device to build your plan. The cloud copy lives in a private document that only you can read: **not even the app's administrator can see it**, and it is never shared.
 - **Your workouts:** the day completed, date, duration, whether it was a low-energy day, and the optional check-in (energy, discomfort and a free-text note).
 
-This data is stored with Google Firebase (Authentication and Cloud Firestore) in the European Union (`eur3`). Security rules only let a signed-in user read and write their own data. The one exception is the app's administrator (the developer), who can see each account's name, email, programme and workout history, including check-ins, in order to follow progress and assign the right programme.
+This data is stored with Google Firebase (Authentication and Cloud Firestore) in the European Union (`eur3`). Security rules only let a signed-in user read and write their own data. The one exception is the app's administrator (the developer), who can see each account's name, email, programme and workout history, including check-ins, in order to follow progress and assign the right programme. The administrator cannot see the health questionnaire.
 
 ## What stays on your device
 
@@ -28,7 +29,7 @@ Workout reminders are local notifications scheduled on the device by iOS. They a
 
 ## Deleting your data
 
-**Settings → Account → Delete account** permanently deletes your account and every workout, check-in and setting stored with it, both in the cloud and on the device. Restarting the programme in Settings removes your workout history while keeping the account.
+**Settings → Account → Delete account** permanently deletes your account, your health questionnaire and every workout, check-in and setting stored with it, both in the cloud and on the device. Restarting the programme in Settings removes your workout history while keeping the account.
 
 ## Health notice
 

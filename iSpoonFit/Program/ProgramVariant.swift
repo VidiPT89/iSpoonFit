@@ -1,11 +1,11 @@
 import Foundation
 
-/// Which version of the 28-day program an account follows. Every account
-/// starts on `standard`; the admin can assign another one, either ahead of
+/// Which plan an account follows. Everyone gets a plan generated from their
+/// health questionnaire; the admin can instead assign a fixed plan, ahead of
 /// time through an invite or later from the admin panel.
 enum ProgramVariant: String, CaseIterable, Identifiable {
-    /// The app's own program: the same four stretches, two minutes, every day.
-    case standard
+    /// Built by `CarePlanGenerator` from the person's own answers.
+    case personalized
     /// Ana's "Desafio 28 dias", exactly as written: the same workouts, but
     /// week 1 closes with two one-minute stretches chosen for each day, and
     /// from day 5 the stretches are held 30 seconds per side.
@@ -15,25 +15,26 @@ enum ProgramVariant: String, CaseIterable, Identifiable {
     var titleKey: String { "variant.\(rawValue)" }
     var descriptionKey: String { "variant.\(rawValue).desc" }
 
-    /// Unknown or missing ids fall back to the standard program.
+    /// Fixed plans ignore the questionnaire and skip it during onboarding.
+    var isFixed: Bool { self != .personalized }
+
+    /// Unknown or missing ids, and the old "standard" id, mean the
+    /// personalized plan.
     init(id: String?) {
-        self = id.flatMap(ProgramVariant.init(rawValue:)) ?? .standard
+        self = id.flatMap(ProgramVariant.init(rawValue:)) ?? .personalized
     }
 
-    var days: [ProgramDay] {
+    func days(profile: HealthProfile?) -> [ProgramDay] {
         switch self {
-        case .standard: return ProgramData.days
+        case .personalized: return CarePlanGenerator.days(for: profile ?? .empty)
         case .anaChallenge: return Self.anaChallengeDays
         }
     }
 
-    func day(at index: Int) -> ProgramDay? {
-        guard index >= 1, index <= days.count else { return nil }
-        return days[index - 1]
-    }
-
-    func days(inWeek week: Int) -> [ProgramDay] {
-        days.filter { $0.week == week }
+    func day(at index: Int, profile: HealthProfile? = nil) -> ProgramDay? {
+        let all = days(profile: profile)
+        guard index >= 1, index <= all.count else { return nil }
+        return all[index - 1]
     }
 
     // MARK: - Ana's challenge
@@ -44,12 +45,12 @@ enum ProgramVariant: String, CaseIterable, Identifiable {
         return copy
     }
 
-    private static func step(_ id: ExerciseID, _ seconds: Int) -> CooldownStep {
-        CooldownStep(ref: ExerciseRef(id), seconds: seconds)
+    private static func step(_ id: ExerciseID, _ seconds: Int) -> TimedStep {
+        TimedStep(ref: ExerciseRef(id), seconds: seconds)
     }
 
     /// The stretches exactly as the plan lists them.
-    static func anaCooldown(forDay index: Int) -> [CooldownStep] {
+    static func anaCooldown(forDay index: Int) -> [TimedStep] {
         switch index {
         case 1: return [step(.childsPose, 60), step(.hamstringStretch, 60)]
         case 2: return [step(.figureFour, 60), step(.quadStretch, 60)]

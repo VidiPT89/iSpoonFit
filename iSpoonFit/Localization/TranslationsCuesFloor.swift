@@ -4,7 +4,7 @@ extension Translations {
     static let floorCues: [String: [Lang: String]] = [
         // MARK: Glute bridge
         "cue.gluteBridge.steps": [
-            .pt: "Deitada de barriga para cima, joelhos fletidos, pés no chão. Expira, aperta os glúteos e sobe a anca até alinhar ombros, anca e joelhos. Desce devagar.",
+            .pt: "Deita-te de barriga para cima, joelhos fletidos, pés no chão. Expira, aperta os glúteos e sobe a anca até alinhar ombros, anca e joelhos. Desce devagar.",
             .en: "Lie on your back, knees bent, feet flat. Exhale, squeeze your glutes and lift your hips until shoulders, hips and knees line up. Lower slowly."
         ],
         "cue.gluteBridge.breathing": [
@@ -58,7 +58,7 @@ extension Translations {
 
         // MARK: Dead bug
         "cue.deadBug.steps": [
-            .pt: "Deitada, braços para o teto, joelhos a 90 graus. Expira e baixa devagar o braço e a perna opostos, mantendo a lombar em contacto com o tapete.",
+            .pt: "Deita-te, braços para o teto, joelhos a 90 graus. Expira e baixa devagar o braço e a perna opostos, mantendo a lombar em contacto com o tapete.",
             .en: "Lying down, arms to the ceiling, knees at 90 degrees. Exhale and slowly lower opposite arm and leg, keeping your lower back on the mat."
         ],
         "cue.deadBug.breathing": [
@@ -80,7 +80,7 @@ extension Translations {
 
         // MARK: Heel taps
         "cue.heelTaps.steps": [
-            .pt: "Deitada, joelhos a 90 graus no ar. Baixa um pé até tocar o calcanhar no chão e volta. Alterna, com a lombar sempre apoiada.",
+            .pt: "Deita-te, joelhos a 90 graus no ar. Baixa um pé até tocar o calcanhar no chão e volta. Alterna, com a lombar sempre apoiada.",
             .en: "Lying down, knees at 90 degrees in the air. Lower one foot to tap your heel on the floor and return. Alternate, keeping your lower back down."
         ],
         "cue.heelTaps.breathing": [
@@ -98,7 +98,7 @@ extension Translations {
 
         // MARK: Pelvic tilt
         "cue.pelvicTilt.steps": [
-            .pt: "Deitada, joelhos fletidos. Expira e roda suavemente a bacia, encostando a lombar ao tapete. Inspira e volta à posição neutra.",
+            .pt: "Deita-te, joelhos fletidos. Expira e roda suavemente a bacia, encostando a lombar ao tapete. Inspira e volta à posição neutra.",
             .en: "Lying down, knees bent. Exhale and gently tilt your pelvis, pressing your lower back into the mat. Inhale and return to neutral."
         ],
         "cue.pelvicTilt.breathing": [
@@ -129,7 +129,7 @@ extension Translations {
         ],
 
         "cue.figureFour.steps": [
-            .pt: "Deitada, cruza o tornozelo sobre o joelho oposto e puxa a coxa em direção ao peito até sentires o glúteo a alongar.",
+            .pt: "Deita-te, cruza o tornozelo sobre o joelho oposto e puxa a coxa em direção ao peito até sentires o glúteo a alongar.",
             .en: "Lying down, cross your ankle over the opposite knee and draw the thigh towards your chest until you feel the glute lengthen."
         ],
         "cue.figureFour.breathing": [
@@ -167,12 +167,12 @@ extension Translations {
             .en: "Inhale as the arm rises, exhale as you bend."
         ],
         "cue.sideStretch.easier": [
-            .pt: "Faz sentada na cadeira, com a outra mão apoiada na coxa.",
+            .pt: "Faz na cadeira, com a outra mão apoiada na coxa.",
             .en: "Do it sitting on the chair, with the other hand resting on your thigh."
         ],
 
         "cue.quadStretch.steps": [
-            .pt: "Deitada de lado ou em pé com apoio, puxa o pé em direção ao glúteo com os joelhos juntos.",
+            .pt: "De lado no tapete ou de pé com apoio, puxa o pé em direção ao glúteo com os joelhos juntos.",
             .en: "Lying on your side or standing with support, draw your foot towards your glutes with your knees together."
         ],
         "cue.quadStretch.breathing": [
@@ -185,7 +185,7 @@ extension Translations {
         ],
 
         "cue.hamstringStretch.steps": [
-            .pt: "Deitada, estica uma perna para o teto com a toalha à volta do pé e puxa suavemente.",
+            .pt: "Deita-te, estica uma perna para o teto com a toalha à volta do pé e puxa suavemente.",
             .en: "Lying down, raise one leg to the ceiling with the towel around your foot and pull gently."
         ],
         "cue.hamstringStretch.breathing": [

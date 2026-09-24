@@ -17,6 +17,7 @@ struct SettingsView: View {
     @State private var reminderWeekdays = ReminderManager.weekdays
     @State private var showsSafety = false
     @State private var showsHistory = false
+    @State private var showsQuestionnaire = false
     @State private var showsRestartConfirmation = false
 
     init(viewModel: ProgramViewModel, auth: AuthService, onAccountDeleted: @escaping () -> Void) {
@@ -54,6 +55,7 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showsSafety) { SafetySheet() }
         .sheet(isPresented: $showsHistory) { HistoryView(viewModel: viewModel) }
+        .sheet(isPresented: $showsQuestionnaire) { HealthQuestionnaireSheet(viewModel: viewModel) }
         .alert(t("settings.restart"), isPresented: $showsRestartConfirmation) {
             Button(t("action.cancel"), role: .cancel) {}
             Button(t("settings.restart"), role: .destructive) {
@@ -259,6 +261,9 @@ struct SettingsView: View {
                 .foregroundStyle(theme.text)
                 .tint(theme.accent)
 
+                if !viewModel.variant.isFixed {
+                    actionRow("health.edit", icon: "list.clipboard.fill") { showsQuestionnaire = true }
+                }
                 actionRow("settings.history", icon: "clock.arrow.circlepath") { showsHistory = true }
                 actionRow("settings.safety", icon: "heart.text.square.fill") { showsSafety = true }
                 actionRow("settings.restart", icon: "arrow.counterclockwise", tint: theme.danger) {

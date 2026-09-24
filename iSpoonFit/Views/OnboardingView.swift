@@ -10,10 +10,20 @@ struct OnboardingView: View {
     @State private var reminderTime = Calendar.current.date(
         from: DateComponents(hour: 9, minute: 0)
     ) ?? Date()
+    @State private var healthProfile = HealthProfile.empty
 
     let theme = Theme.shared
 
-    private let pageCount = 4
+    private enum Page { case welcome, safety, health, material, start }
+
+    /// A fixed plan (assigned by the admin) does not need the questionnaire.
+    private var pages: [Page] {
+        viewModel.variant.isFixed
+            ? [.welcome, .safety, .material, .start]
+            : [.welcome, .safety, .health, .material, .start]
+    }
+
+    private var pageCount: Int { pages.count }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -25,10 +35,9 @@ struct OnboardingView: View {
             .padding(.top, 10)
 
             TabView(selection: $page) {
-                welcomePage.tag(0)
-                safetyPage.tag(1)
-                materialPage.tag(2)
-                startPage.tag(3)
+                ForEach(Array(pages.enumerated()), id: \.offset) { index, kind in
+                    pageView(kind).tag(index)
+                }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             // Swiping must not get past the safety page without the clearance
@@ -57,6 +66,36 @@ struct OnboardingView: View {
 
     // MARK: - Pages
 
+    @ViewBuilder
+    private func pageView(_ kind: Page) -> some View {
+        switch kind {
+        case .welcome: welcomePage
+        case .safety: safetyPage
+        case .health: healthPage
+        case .material: materialPage
+        case .start: startPage
+        }
+    }
+
+    private var healthPage: some View {
+        ScrollView {
+            VStack(spacing: 18) {
+                Image(systemName: "list.clipboard.fill")
+                    .font(.system(size: 44))
+                    .foregroundStyle(theme.accentGradient)
+                    .padding(.top, 20)
+                Text(t("health.title"))
+                    .font(.title.bold())
+                    .foregroundStyle(theme.text)
+                HealthQuestionnaireForm(profile: $healthProfile)
+            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 12)
+        }
+        .scrollIndicators(.hidden)
+        .scrollDismissesKeyboard(.interactively)
+    }
+
     private var welcomePage: some View {
         page(icon: "figure.core.training", titleKey: "onboarding.welcomeTitle") {
             Text(t("onboarding.welcomeBody"))
@@ -66,7 +105,7 @@ struct OnboardingView: View {
 
             HStack(spacing: 10) {
                 highlight("28", t("onboarding.workouts"))
-                highlight("20", "min")
+                highlight("10–20", "min")
                 highlight("4", t("weekday.mon") + "–" + t("weekday.thu"))
             }
             .padding(.top, 6)
@@ -244,7 +283,8 @@ struct OnboardingView: View {
                     viewModel.startProgram(
                         startDate: Calendar.current.startOfDay(for: startDate),
                         reminderTime: reminderEnabled ? reminderTime : nil,
-                        medicalClearance: clearance
+                        medicalClearance: clearance,
+                        healthProfile: viewModel.variant.isFixed ? nil : healthProfile
                     )
                 }
             }

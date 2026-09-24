@@ -45,7 +45,7 @@ service cloud.firestore {
           'name', 'email', 'programID', 'startDate', 'reminderEnabled',
           'reminderTime', 'medicalClearance', 'updatedAt'])
         && (!('name' in data) || (data.name is string && data.name.size() <= 100))
-        && (!('programID' in data) || data.programID in ['standard', 'anaChallenge']);
+        && (!('programID' in data) || data.programID in ['standard', 'personalized', 'anaChallenge']);
     }
 
     // The email shown in the admin panel has to be the one the owner signed
@@ -74,6 +74,17 @@ service cloud.firestore {
           || (!('programID' in resource.data) && takesInvitedProgram())
         )));
       allow delete: if isOwner(uid);
+
+      // Health questionnaire answers: the owner only. Not even the admin
+      // can read them.
+      match /private/{docID} {
+        allow read, delete: if isOwner(uid) && docID == 'health';
+        allow create, update: if isOwner(uid) && docID == 'health'
+          && request.resource.data.keys().hasOnly(['profile', 'updatedAt'])
+          && request.resource.data.profile is string
+          && request.resource.data.profile.size() <= 4000
+          && request.resource.data.updatedAt is number;
+      }
 
       match /sessions/{sessionID} {
         allow read: if isOwner(uid) || isAdmin();

@@ -58,6 +58,15 @@ await check('ana cannot read admin views', assertFails(getDocs(collection(ana, '
 await check('admin lists users', assertSucceeds(getDocs(collection(admin, 'users'))));
 await check('admin reads sessions of others', assertSucceeds(getDocs(collection(admin, 'users/other/sessions'))));
 await check('admin assigns program', assertSucceeds(setDoc(doc(admin, 'users/ana'), { programID: 'standard' }, { merge: true })));
+await check('admin assigns the personalized plan', assertSucceeds(setDoc(doc(admin, 'users/ana'), { programID: 'personalized' }, { merge: true })));
+await check('bob saves his health answers', assertSucceeds(setDoc(doc(bob, 'users/bob/private/health'), { profile: '{"energy":3}', updatedAt: 5 })));
+await check('bob reads his health answers', assertSucceeds(getDoc(doc(bob, 'users/bob/private/health'))));
+await check('health answers must be small', assertFails(setDoc(doc(bob, 'users/bob/private/health'), { profile: 'x'.repeat(4001), updatedAt: 5 })));
+await check('no other private documents', assertFails(setDoc(doc(bob, 'users/bob/private/other'), { profile: 'x', updatedAt: 5 })));
+await check('ana cannot read bob health answers', assertFails(getDoc(doc(ana, 'users/bob/private/health'))));
+await check('admin cannot read health answers', assertFails(getDoc(doc(admin, 'users/bob/private/health'))));
+await check('admin cannot write health answers', assertFails(setDoc(doc(admin, 'users/bob/private/health'), { profile: '{}', updatedAt: 1 })));
+await check('bob deletes his health answers', assertSucceeds(deleteDoc(doc(bob, 'users/bob/private/health'))));
 await check('admin cannot assign an unknown program', assertFails(setDoc(doc(admin, 'users/ana'), { programID: 'whatever' }, { merge: true })));
 await check('admin writes invite', assertSucceeds(setDoc(doc(admin, 'invites/new@mail.pt'), { programID: 'anaChallenge' })));
 await check('admin deletes invite', assertSucceeds(deleteDoc(doc(admin, 'invites/new@mail.pt'))));

@@ -6,7 +6,7 @@ import Foundation
 enum Translations {
     static let table: [String: [Lang: String]] = {
         var merged = core
-        for part in [program, exercises, cues, account] {
+        for part in [program, exercises, cues, account, care, health] {
             merged.merge(part) { current, _ in current }
         }
         return merged
@@ -16,8 +16,8 @@ enum Translations {
         // MARK: App and credits
         "app.name": [.pt: "iSpoonFit", .en: "iSpoonFit"],
         "app.tagline": [
-            .pt: "Treino suave e progressivo, 20 minutos por dia",
-            .en: "Gentle, progressive training, 20 minutes a day"
+            .pt: "Exercício de cuidado, ao ritmo do teu corpo",
+            .en: "Care exercise, at your body's pace"
         ],
         "about.developedBy": [
             .pt: "Desenvolvido por",
@@ -47,7 +47,7 @@ enum Translations {
             .pt: "Uma caminhada leve e alguns minutos de respiração calma ajudam na recuperação.",
             .en: "A light walk and a few minutes of calm breathing help recovery."
         ],
-        "today.restWalk": [.pt: "Caminhada de 10 a 20 minutos", .en: "A 10 to 20 minute walk"],
+        "today.restWalk": [.pt: "Uma caminhada curta, se te apetecer", .en: "A short walk, if you feel like it"],
         "today.restBreathing": [.pt: "Respiração diafragmática", .en: "Diaphragmatic breathing"],
         "today.restStretch": [.pt: "Alongamentos suaves", .en: "Gentle stretching"],
         "today.nextWorkout": [.pt: "Próximo treino", .en: "Next workout"],
@@ -86,6 +86,9 @@ enum Translations {
         "category.warmup": [.pt: "Aquecimento", .en: "Warm-up"],
         "category.legsGlutes": [.pt: "Pernas e glúteos", .en: "Legs & glutes"],
         "category.core": [.pt: "Core", .en: "Core"],
+        "category.mobility": [.pt: "Mobilidade e respiração", .en: "Mobility & breathing"],
+        "category.upperBody": [.pt: "Parte de cima", .en: "Upper body"],
+        "category.balance": [.pt: "Equilíbrio", .en: "Balance"],
         "category.stretch": [.pt: "Alongamentos", .en: "Stretching"],
 
         // MARK: Exercise detail sections
@@ -139,10 +142,13 @@ enum Translations {
         "action.delete": [.pt: "Apagar", .en: "Delete"],
 
         // MARK: Onboarding
-        "onboarding.welcomeTitle": [.pt: "Bem-vinda ao iSpoonFit", .en: "Welcome to iSpoonFit"],
+        "onboarding.welcomeTitle": [
+            .pt: "Boas-vindas ao iSpoonFit",
+            .en: "Welcome to iSpoonFit"
+        ],
         "onboarding.welcomeBody": [
-            .pt: "28 treinos de 20 minutos, de segunda a quinta, em casa e sem saltos. Cada semana avança um pouco, ao teu ritmo.",
-            .en: "28 workouts of 20 minutes, Monday to Thursday, at home and with no jumping. Each week steps up a little, at your own pace."
+            .pt: "28 sessões de cuidado, de segunda a quinta, pensadas para quem vive com uma doença crónica. Movimentos suaves, em casa, adaptados ao teu corpo e à tua energia.",
+            .en: "28 care sessions, Monday to Thursday, made for people living with a chronic condition. Gentle movement at home, adapted to your body and your energy."
         ],
         "onboarding.safetyTitle": [.pt: "Primeiro, a tua segurança", .en: "Your safety first"],
         "onboarding.clearance": [
@@ -151,8 +157,8 @@ enum Translations {
         ],
         "onboarding.materialTitle": [.pt: "O que vais precisar", .en: "What you'll need"],
         "onboarding.materialBody": [
-            .pt: "Nada de ginásio. Um canto tranquilo e estas quatro coisas chegam.",
-            .en: "No gym needed. A quiet corner and these four things are enough."
+            .pt: "Nada de ginásio. Um canto tranquilo e uma cadeira estável chegam; o resto depende do teu plano.",
+            .en: "No gym needed. A quiet corner and a sturdy chair are enough; the rest depends on your plan."
         ],
         "onboarding.startTitle": [.pt: "Quando começamos?", .en: "When do we start?"],
         "onboarding.startBody": [
@@ -172,28 +178,28 @@ enum Translations {
         // MARK: Safety card
         "safety.title": [.pt: "Antes de começares", .en: "Before you start"],
         "safety.point1": [
-            .pt: "Este programa não substitui aconselhamento médico. Fala com o teu médico antes de começar, sobretudo após o parto ou uma cesariana.",
-            .en: "This program does not replace medical advice. Talk to your doctor before starting, especially after giving birth or a C-section."
+            .pt: "O iSpoonFit não substitui aconselhamento médico. Fala com o teu médico ou fisioterapeuta antes de começar, sobretudo se tens uma doença crónica, estás no pós-parto ou em tratamento.",
+            .en: "iSpoonFit does not replace medical advice. Talk to your doctor or physiotherapist before starting, especially if you have a chronic condition, have recently given birth or are having treatment."
         ],
         "safety.point2": [
-            .pt: "Depois de uma cesariana, espera pela autorização médica e começa sempre pela Semana 1.",
-            .en: "After a C-section, wait for medical clearance and always start from Week 1."
+            .pt: "Menos é mais: termina cada sessão com energia de sobra. Com fibromialgia, fadiga crónica ou COVID longa, o cansaço pode aparecer horas ou dias depois.",
+            .en: "Less is more: finish every session with energy to spare. With fibromyalgia, chronic fatigue or long COVID, tiredness can show up hours or days later."
         ],
         "safety.point3": [
             .pt: "Expira durante o esforço e nunca prendas a respiração.",
             .en: "Breathe out on the effort and never hold your breath."
         ],
         "safety.point4": [
-            .pt: "Para imediatamente se sentires dor na cicatriz, hemorragia, peso ou pressão pélvica, tonturas, dor no peito ou dor articular aguda.",
-            .en: "Stop immediately if you feel pain at the scar, bleeding, pelvic heaviness or pressure, dizziness, chest pain or sharp joint pain."
+            .pt: "Para imediatamente se sentires dor no peito, falta de ar fora do normal, tonturas, palpitações ou dor aguda nas articulações. Depois de uma cesariana, também se sentires dor na cicatriz ou hemorragia.",
+            .en: "Stop immediately if you feel chest pain, unusual breathlessness, dizziness, palpitations or sharp joint pain. After a C-section, also if you feel pain at the scar or bleeding."
         ],
         "safety.point5": [
-            .pt: "Se o abdómen fizer uma crista ou volume ao centro durante um exercício, reduz a intensidade e fala com um fisioterapeuta.",
-            .en: "If your belly forms a ridge or bulge along the midline during an exercise, reduce the intensity and speak to a physiotherapist."
+            .pt: "Em fase de surto, febre, infeção ou muita fadiga, descansa ou usa o modo Dia difícil. Descansar também faz parte do plano.",
+            .en: "During a flare, fever, infection or heavy fatigue, rest or use Low-energy day mode. Resting is part of the plan too."
         ],
         "safety.point6": [
-            .pt: "Em fase de surto ou de maior fadiga, descansa ou usa o modo Dia difícil.",
-            .en: "During a flare or on high-fatigue days, rest or use Low-energy day mode."
+            .pt: "No pós-parto, se o abdómen fizer uma crista ao centro durante um exercício, reduz a intensidade e fala com um fisioterapeuta.",
+            .en: "After giving birth, if your belly forms a ridge along the midline during an exercise, reduce the intensity and speak to a physiotherapist."
         ]
     ]
 }

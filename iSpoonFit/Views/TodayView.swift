@@ -7,6 +7,7 @@ struct TodayView: View {
 
     @State private var activeDay: ProgramDay?
     @State private var appeared = false
+    @State private var showsQuestionnaire = false
 
     let theme = Theme.shared
 
@@ -17,6 +18,10 @@ struct TodayView: View {
                     .padding(.top, 8)
 
                 progressCard
+
+                if viewModel.needsQuestionnaire {
+                    questionnaireCard
+                }
 
                 if viewModel.isProgramComplete {
                     completeCard
@@ -40,6 +45,9 @@ struct TodayView: View {
         .scrollIndicators(.hidden)
         .onAppear {
             withAnimation(theme.springAnimation.delay(0.05)) { appeared = true }
+        }
+        .sheet(isPresented: $showsQuestionnaire) {
+            HealthQuestionnaireSheet(viewModel: viewModel)
         }
         .fullScreenCover(item: $activeDay) { day in
             SessionPlayerView(
@@ -72,6 +80,32 @@ struct TodayView: View {
     }
 
     // MARK: - Cards
+
+    /// For accounts created before the questionnaire existed: the plan is
+    /// still generated, but only from safe defaults until it is answered.
+    private var questionnaireCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: "list.clipboard.fill")
+                    .font(.title3)
+                    .foregroundStyle(theme.accent)
+                    .symbolRenderingMode(.hierarchical)
+                Text(t("health.todayTitle"))
+                    .font(.headline)
+                    .foregroundStyle(theme.text)
+                Spacer()
+            }
+            Text(t("health.todayBody"))
+                .font(.subheadline)
+                .foregroundStyle(theme.textDim)
+                .fixedSize(horizontal: false, vertical: true)
+            OutlineButton(titleKey: "health.todayAction", icon: "arrow.right") {
+                showsQuestionnaire = true
+            }
+        }
+        .padding(18)
+        .panelBackground(highlighted: true)
+    }
 
     private var progressCard: some View {
         HStack(spacing: 18) {

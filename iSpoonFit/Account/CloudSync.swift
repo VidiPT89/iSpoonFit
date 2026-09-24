@@ -12,6 +12,7 @@ protocol CloudSyncing: AnyObject {
     func fetch() async throws -> CloudSnapshot
     func save(state: RemoteState) async throws
     func save(session: RemoteSession) async throws
+    func save(health: RemoteHealth) async throws
     func deleteSession(id: String) async throws
     func deleteEverything() async throws
 }
@@ -23,6 +24,7 @@ protocol CloudSyncing: AnyObject {
 final class FirestoreCloudSync: CloudSyncing {
     private let userDocument: DocumentReference
     private var sessions: CollectionReference { userDocument.collection("sessions") }
+    private var healthDocument: DocumentReference { userDocument.collection("private").document("health") }
 
     /// A first sync should never keep someone staring at a spinner; past this
     /// the app carries on with what is on the device.
@@ -70,12 +72,14 @@ final class FirestoreCloudSync: CloudSyncing {
     private func load() async throws -> CloudSnapshot {
         let stateDocument = try await userDocument.getDocument()
         let sessionDocuments = try await sessions.getDocuments()
+        let healthData = try await healthDocument.getDocument().data()
         return CloudSnapshot(
             state: stateDocument.data().flatMap(RemoteState.init(fields:)),
             sessions: sessionDocuments.documents.compactMap {
                 RemoteSession(id: $0.documentID, fields: $0.data())
             },
-            programID: stateDocument.get("programID") as? String
+            programID: stateDocument.get("programID") as? String,
+            health: healthData.flatMap(RemoteHealth.init(fields:))
         )
     }
 
@@ -85,6 +89,10 @@ final class FirestoreCloudSync: CloudSyncing {
 
     func save(session: RemoteSession) async throws {
         try await sessions.document(session.id).setData(session.fields)
+    }
+
+    func save(health: RemoteHealth) async throws {
+        try await healthDocument.setData(health.fields)
     }
 
     func deleteSession(id: String) async throws {
@@ -100,6 +108,7 @@ final class FirestoreCloudSync: CloudSyncing {
             for document in try await self.sessions.getDocuments(source: .server).documents {
                 batch.deleteDocument(document.reference)
             }
+            batch.deleteDocument(self.healthDocument)
             batch.deleteDocument(self.userDocument)
             try await batch.commit()
         }

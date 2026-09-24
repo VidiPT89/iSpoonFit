@@ -34,13 +34,14 @@ enum ProgramData {
         ref(.marchInPlace), ref(.gentleSquat), ref(.hipCircles), ref(.armSwings)
     ]
     static let warmupSeconds = 45
+    static let warmupSteps: [TimedStep] = warmup.map { TimedStep(ref: $0, seconds: warmupSeconds) }
 
     /// Identical in every session: two minutes of stretching to finish.
-    static let cooldown: [CooldownStep] = [
-        CooldownStep(ref: ref(.childsPose), seconds: 30),
-        CooldownStep(ref: ref(.figureFour), seconds: 30),
-        CooldownStep(ref: ref(.quadStretch), seconds: 30),
-        CooldownStep(ref: ref(.hamstringStretch), seconds: 30)
+    static let cooldown: [TimedStep] = [
+        TimedStep(ref: ref(.childsPose), seconds: 30),
+        TimedStep(ref: ref(.figureFour), seconds: 30),
+        TimedStep(ref: ref(.quadStretch), seconds: 30),
+        TimedStep(ref: ref(.hamstringStretch), seconds: 30)
     ]
 
     /// Seconds spent on the "get ready" step before the first warm-up move.

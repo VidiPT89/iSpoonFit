@@ -19,6 +19,10 @@ final class ProgramViewModel {
     /// A program assigned in the cloud before this account finished
     /// onboarding; used when the local program is created.
     var assignedProgramID: String?
+    /// Questionnaire answers found in the cloud before this device finished
+    /// onboarding, applied when the local program is created.
+    var pendingHealthJSON: String?
+    @ObservationIgnored private var planCache: (key: String, days: [ProgramDay])?
     private let calendar = Calendar.current
 
     /// Reset every calendar day, so "low-energy" never silently carries over.
@@ -53,9 +57,42 @@ final class ProgramViewModel {
 
     var variant: ProgramVariant { ProgramVariant(id: state?.programID ?? assignedProgramID) }
 
-    func day(at index: Int) -> ProgramDay? { variant.day(at: index) }
+    private var healthJSON: String? { state?.healthProfileJSON ?? pendingHealthJSON }
 
-    func days(inWeek week: Int) -> [ProgramDay] { variant.days(inWeek: week) }
+    var healthProfile: HealthProfile? { healthJSON.flatMap { try? HealthProfile(json: $0) } }
+
+    /// A personalized plan that has never had its questionnaire answered
+    /// (accounts created before it existed) should ask for it.
+    var needsQuestionnaire: Bool { !variant.isFixed && healthProfile == nil }
+
+    /// Every day of this account's plan. Generated plans are cheap but read
+    /// often, so they are kept until the answers or the plan change.
+    var planDays: [ProgramDay] {
+        let key = variant.rawValue + "|" + (healthJSON ?? "")
+        if let cache = planCache, cache.key == key { return cache.days }
+        let days = variant.days(profile: healthProfile)
+        planCache = (key, days)
+        return days
+    }
+
+    func day(at index: Int) -> ProgramDay? {
+        let days = planDays
+        guard index >= 1, index <= days.count else { return nil }
+        return days[index - 1]
+    }
+
+    func days(inWeek week: Int) -> [ProgramDay] { planDays.filter { $0.week == week } }
+
+    /// Saves new questionnaire answers; the plan regenerates from them.
+    /// Completed days keep counting, since progress is stored by day number.
+    func updateHealthProfile(_ profile: HealthProfile) {
+        guard let state, let context else { return }
+        state.healthProfileJSON = profile.sanitized.encoded
+        state.healthUpdatedAt = .now
+        try? context.save()
+        refresh()
+        pushHealth()
+    }
 
     func refresh() {
         guard let context else { return }
@@ -66,7 +103,12 @@ final class ProgramViewModel {
 
     var hasOnboarded: Bool { state != nil }
 
-    func startProgram(startDate: Date, reminderTime: Date?, medicalClearance: Bool) {
+    func startProgram(
+        startDate: Date,
+        reminderTime: Date?,
+        medicalClearance: Bool,
+        healthProfile: HealthProfile? = nil
+    ) {
         guard let context else { return }
         let newState = ProgramState(
             startDate: startDate,
@@ -75,10 +117,18 @@ final class ProgramViewModel {
             medicalClearance: medicalClearance
         )
         newState.programID = variant.rawValue
+        if let healthProfile {
+            newState.healthProfileJSON = healthProfile.sanitized.encoded
+            newState.healthUpdatedAt = .now
+        } else if let pendingHealthJSON {
+            newState.healthProfileJSON = pendingHealthJSON
+            newState.healthUpdatedAt = .now
+        }
         context.insert(newState)
         try? context.save()
         refresh()
         pushState()
+        pushHealth()
         if let reminderTime {
             Task { await updateReminder(enabled: true, time: reminderTime) }
         }

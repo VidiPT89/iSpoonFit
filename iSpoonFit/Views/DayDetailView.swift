@@ -18,7 +18,7 @@ struct DayDetailView: View {
         ScrollView {
             VStack(spacing: 18) {
                 summary
-                block(.warmup, entries: ProgramData.warmup.map { ($0, ProgramData.warmupSeconds) })
+                block(.warmup, entries: day.warmup.map { ($0.ref, $0.seconds) })
                 block(.workout, entries: workoutEntries)
                 block(.cooldown, entries: day.cooldown.map { ($0.ref, $0.seconds) })
 
