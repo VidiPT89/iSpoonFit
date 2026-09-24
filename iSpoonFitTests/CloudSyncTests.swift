@@ -291,3 +291,14 @@ final class CloudSyncTests: XCTestCase {
         )
     }
 }
+
+final class AuthErrorDetailsTests: XCTestCase {
+    func testRecognisesTheServerSayingAuthenticationIsOff() {
+        let server = NSError(domain: "FIRAuthInternalErrorDomain", code: 3, userInfo: [
+            "FIRAuthErrorUserInfoDeserializedResponseKey": ["message": "CONFIGURATION_NOT_FOUND", "code": 400]
+        ])
+        let wrapped = NSError(domain: "FIRAuthErrorDomain", code: 17999, userInfo: [NSUnderlyingErrorKey: server])
+        XCTAssertTrue(AuthErrorDetails.isServiceNotConfigured(wrapped))
+        XCTAssertFalse(AuthErrorDetails.isServiceNotConfigured(NSError(domain: "FIRAuthErrorDomain", code: 17009)))
+    }
+}

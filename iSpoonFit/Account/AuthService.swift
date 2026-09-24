@@ -298,6 +298,12 @@ final class AuthService {
     }
 
     private static func messageKey(for error: NSError) -> String? {
+        // The project's Authentication has not been switched on in the
+        // Firebase console: the server answers every sign-in with this, and
+        // the SDK only reports it as an internal error.
+        if AuthErrorDetails.isServiceNotConfigured(error) {
+            return "auth.error.notConfigured"
+        }
         guard error.domain == AuthErrorDomain, let code = AuthErrorCode(rawValue: error.code) else {
             return "auth.error.generic"
         }

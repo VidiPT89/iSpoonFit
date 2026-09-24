@@ -140,6 +140,10 @@ extension Translations {
             .pt: "Esta forma de entrada ainda não está disponível.",
             .en: "This sign-in method is not available yet."
         ],
+        "auth.error.notConfigured": [
+            .pt: "O registo e a entrada ainda não estão ativos no servidor da app. Tenta mais tarde.",
+            .en: "Sign-up and sign-in are not switched on for the app's server yet. Please try again later."
+        ],
         "auth.error.generic": [
             .pt: "Algo correu mal. Tenta outra vez.",
             .en: "Something went wrong. Please try again."
