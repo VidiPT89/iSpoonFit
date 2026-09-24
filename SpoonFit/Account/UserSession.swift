@@ -16,7 +16,9 @@ final class UserSession {
         viewModel = ProgramViewModel()
         viewModel.load(
             context: container.mainContext,
-            sync: syncsToCloud ? FirestoreCloudSync(uid: user.uid) : nil
+            sync: syncsToCloud ? FirestoreCloudSync(uid: user.uid) : nil,
+            name: user.name,
+            email: user.email
         )
     }
 

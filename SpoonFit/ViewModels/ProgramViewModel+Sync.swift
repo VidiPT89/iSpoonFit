@@ -13,10 +13,12 @@ extension ProgramViewModel {
     /// When the cloud cannot be reached nothing changes locally.
     func synchronize() async {
         guard let sync, let context else { return }
+        try? await sync.claimProfile(name: profile.name, email: profile.email)
         guard let snapshot = try? await sync.fetch() else { return }
 
         mergeState(snapshot.state, into: context)
         mergeSessions(snapshot.sessions, into: context)
+        applyAssignedProgram(snapshot.programID, in: context)
 
         try? context.save()
         refresh()
@@ -42,6 +44,16 @@ extension ProgramViewModel {
             pushState()
         default:
             break
+        }
+    }
+
+    /// The assigned program always comes from the cloud: only the admin or
+    /// an invite can change it.
+    private func applyAssignedProgram(_ programID: String?, in context: ModelContext) {
+        guard let programID else { return }
+        assignedProgramID = programID
+        if let local = (try? context.fetch(FetchDescriptor<ProgramState>()))?.first {
+            local.programID = programID
         }
     }
 

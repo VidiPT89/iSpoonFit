@@ -8,6 +8,7 @@
 ## ✨ Features
 
 - ✅ Personal accounts: sign up with email and password, or continue with Apple, Google or Microsoft
+- ✅ One admin account with a private panel: every account's progress and check-ins, program assignment and profiles prepared ahead of time by email
 - ✅ Progress synced to your account with Cloud Firestore, so it follows you to any iPhone or iPad, and keeps working offline
 - ✅ A complete 28-session plan: seven weeks, four sessions per week, Monday to Thursday, across four phases of progression
 - ✅ 21 bodyweight exercises across warm-up, legs and glutes, core and stretching, each with its own animated demonstration
@@ -69,7 +70,7 @@ The app talks to the Firebase project `ispoonfit-vidi`. Its iOS config lives in 
 sh scripts/fetch-firebase-config.sh
 ```
 
-A build phase reads that file and registers the URL schemes Google and Microsoft sign-in return on. Firestore security rules live in `firebase/firestore.rules` and are deployed with `firebase deploy --only firestore`.
+Firestore security rules (`firebase/firestore.rules`) keep every account to its own data; only the admin, identified by a verified email, can read other accounts, assign programmes and prepare profiles. A build phase reads that file and registers the URL schemes Google and Microsoft sign-in return on. Deploy the rules with `firebase deploy --only firestore`.
 
 > The Xcode project is generated from `project.yml` and is not committed. If you add or move Swift files, regenerate it with `xcodegen generate`.
 
@@ -95,7 +96,16 @@ Language, appearance, sounds, voice, haptics, reminders and your account (sign o
 | 5 to 6 | 45s | 15s | 4 | Endurance |
 | 7 | 50s | 10s | 4 | Consolidation |
 
-Every session is built the same way: a fixed 3-minute warm-up, a circuit of the four exercises for that day, and a 2-minute stretching block to close.
+Every session is built the same way: a fixed 3-minute warm-up, a circuit of the four exercises for that day, and a stretching block to close.
+
+Two versions of the programme share the same 28 workouts and differ only in the stretching:
+
+| Programme | Stretching |
+|-----------|------------|
+| **SpoonFit 28** (default) | The same four stretches every day, 2 minutes |
+| **Ana's 28-day challenge** | Week 1: two one-minute stretches chosen for each day, including hip flexors and a standing side stretch. Days 5 to 27: child's pose 30 s, then figure-4, quad and hamstring 30 s per side. Day 28: 2 minutes |
+
+New accounts start on the default. The admin can assign another programme from the admin panel, or ahead of time with a profile prepared for that email.
 
 ## 🧪 Testing
 
@@ -104,7 +114,13 @@ xcodebuild -project SpoonFit.xcodeproj -scheme SpoonFit \
   -destination 'platform=iOS Simulator,name=iPhone 17' test
 ```
 
-74 tests cover the programme data, the session builder, the animation poses, the translations, the view models, the sign-in form and the cloud sync merge rules.
+84 tests cover the programme data and both programme versions, the session builder, the animation poses, the translations, the view models, the sign-in form, the admin role and the cloud sync merge rules.
+
+The Firestore security rules have their own tests against the local emulator (needs Java):
+
+```bash
+cd firebase/tests && npm install && npm test
+```
 
 ## 🔒 Privacy
 

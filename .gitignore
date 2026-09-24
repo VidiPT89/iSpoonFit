@@ -8,3 +8,5 @@ build/
 *.xcodeproj/
 SpoonFit/Info.plist
 SpoonFit/SpoonFit.entitlements
+node_modules/
+*-debug.log

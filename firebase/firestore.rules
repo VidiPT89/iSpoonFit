@@ -1,14 +1,65 @@
 rules_version = '2';
 
-// Every document lives under users/{uid} and only its owner can reach it.
+// Every account lives under users/{uid} and only its owner can reach it,
+// except the single admin, who can read every account and assign programs.
+// Profiles prepared ahead of time live in invites/{email}.
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
 
-      match /{document=**} {
-        allow read, write: if request.auth != null && request.auth.uid == uid;
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Keep in step with AdminPolicy.email in the app.
+    // Emails are compared in lower case, like the app does.
+    function email() {
+      return request.auth.token.email.lower();
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && request.auth.token.email != null
+        && email() == 'damartins89@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function invitePath() {
+      return /databases/$(database)/documents/invites/$(email());
+    }
+
+    // An owner may only set programID when it is not set yet, and only to
+    // the program of the invite that matches their email.
+    function takesInvitedProgram() {
+      return request.auth.token.email != null
+        && exists(invitePath())
+        && request.resource.data.programID == get(invitePath()).data.programID;
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isAdmin()
+        || (isOwner(uid) && (!('programID' in request.resource.data) || takesInvitedProgram()));
+      allow update: if isAdmin()
+        || (isOwner(uid) && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['programID'])
+          || (!('programID' in resource.data) && takesInvitedProgram())
+        ));
+      allow delete: if isOwner(uid);
+
+      match /sessions/{sessionID} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow write: if isOwner(uid);
       }
+    }
+
+    match /invites/{inviteEmail} {
+      allow read: if isAdmin()
+        || (signedIn() && request.auth.token.email != null && email() == inviteEmail);
+      allow write: if isAdmin();
     }
   }
 }

@@ -1,0 +1,66 @@
+import XCTest
+@testable import SpoonFit
+
+/// Ana's challenge must match her written plan exactly.
+final class ProgramVariantTests: XCTestCase {
+    private let ana = ProgramVariant.anaChallenge
+
+    private func stretches(_ day: Int) -> [ExerciseID] {
+        ana.day(at: day)!.cooldown.map(\.ref.exercise)
+    }
+
+    private func seconds(_ day: Int) -> [Int] {
+        ana.day(at: day)!.cooldown.map(\.seconds)
+    }
+
+    func testWorkoutsAreTheSameAsTheStandardProgram() {
+        XCTAssertEqual(ana.days.count, 28)
+        for (mine, standard) in zip(ana.days, ProgramVariant.standard.days) {
+            XCTAssertEqual(mine.index, standard.index)
+            XCTAssertEqual(mine.titleKey, standard.titleKey)
+            XCTAssertEqual(mine.exercises, standard.exercises, "Day \(mine.index)")
+        }
+    }
+
+    func testWeekOneHasItsOwnPairOfOneMinuteStretchesEachDay() {
+        XCTAssertEqual(stretches(1), [.childsPose, .hamstringStretch])
+        XCTAssertEqual(stretches(2), [.figureFour, .quadStretch])
+        XCTAssertEqual(stretches(3), [.childsPose, .hipFlexorStretch])
+        XCTAssertEqual(stretches(4), [.sideStretch, .hamstringStretch])
+        for day in 1...4 {
+            XCTAssertEqual(seconds(day), [60, 60], "Day \(day)")
+        }
+    }
+
+    func testFromDayFiveStretchesAreHeldThirtySecondsPerSide() {
+        for day in 5...27 {
+            XCTAssertEqual(stretches(day), [.childsPose, .figureFour, .quadStretch, .hamstringStretch], "Day \(day)")
+            XCTAssertEqual(seconds(day), [30, 60, 60, 60], "Day \(day)")
+        }
+    }
+
+    func testTheFinalDayEndsWithTwoMinutesOfStretching() {
+        XCTAssertEqual(seconds(28).reduce(0, +), 120)
+        XCTAssertEqual(stretches(28), [.childsPose, .figureFour, .quadStretch, .hamstringStretch])
+    }
+
+    func testTwoSidedStretchesSwitchHalfway() {
+        let steps = SessionBuilder.steps(for: ana.day(at: 5)!)
+        let figureFour = steps.first { $0.block == .cooldown && $0.ref.exercise == .figureFour }
+        XCTAssertEqual(figureFour?.switchSideAtSecond, 30)
+        let hipFlexor = SessionBuilder.steps(for: ana.day(at: 3)!).first { $0.ref.exercise == .hipFlexorStretch }
+        XCTAssertEqual(hipFlexor?.switchSideAtSecond, 30)
+    }
+
+    func testTheStandardProgramKeepsItsTwoMinuteRoutine() {
+        for day in ProgramVariant.standard.days {
+            XCTAssertEqual(day.cooldown, ProgramData.cooldown)
+        }
+    }
+
+    func testUnknownProgramIDsFallBackToStandard() {
+        XCTAssertEqual(ProgramVariant(id: nil), .standard)
+        XCTAssertEqual(ProgramVariant(id: "something-else"), .standard)
+        XCTAssertEqual(ProgramVariant(id: "anaChallenge"), .anaChallenge)
+    }
+}

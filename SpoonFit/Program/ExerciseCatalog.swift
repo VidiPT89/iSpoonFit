@@ -115,6 +115,16 @@ enum ExerciseCatalog {
             id: .hamstringStretch, nameKey: "stretch.hamstring", category: .stretch,
             motion: .hamstringStretch, isUnilateral: true, isAlternating: false,
             muscleKeys: ["muscle.hamstrings"]
+        ),
+        Exercise(
+            id: .hipFlexorStretch, nameKey: "stretch.hipFlexor", category: .stretch,
+            motion: .hipFlexorStretch, isUnilateral: true, isAlternating: false,
+            muscleKeys: ["muscle.hipFlexors", "muscle.quads"]
+        ),
+        Exercise(
+            id: .sideStretch, nameKey: "stretch.side", category: .stretch,
+            motion: .sideStretch, isUnilateral: true, isAlternating: false,
+            muscleKeys: ["muscle.obliques", "muscle.lowerBack"]
         )
     ]
 

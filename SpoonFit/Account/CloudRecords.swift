@@ -98,6 +98,15 @@ struct RemoteSession: Equatable {
 struct CloudSnapshot: Equatable {
     var state: RemoteState?
     var sessions: [RemoteSession]
+    /// Set by the admin or an invite, never written by the app itself, so it
+    /// travels apart from the settings the user can change.
+    var programID: String?
+
+    init(state: RemoteState?, sessions: [RemoteSession], programID: String? = nil) {
+        self.state = state
+        self.sessions = sessions
+        self.programID = programID
+    }
 }
 
 /// Reads numbers defensively: the database hands them back as NSNumber of

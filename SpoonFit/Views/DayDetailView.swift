@@ -20,7 +20,7 @@ struct DayDetailView: View {
                 summary
                 block(.warmup, entries: ProgramData.warmup.map { ($0, ProgramData.warmupSeconds) })
                 block(.workout, entries: workoutEntries)
-                block(.cooldown, entries: ProgramData.cooldown.map { ($0.ref, $0.seconds) })
+                block(.cooldown, entries: day.cooldown.map { ($0.ref, $0.seconds) })
 
                 if isUnlocked {
                     GradientButton(

@@ -5,6 +5,10 @@ import Foundation
 /// to this protocol, so tests can swap in an in-memory copy.
 @MainActor
 protocol CloudSyncing: AnyObject {
+    /// Creates the account's profile document the first time, taking the
+    /// program from a pending invite for its email, and keeps the name and
+    /// email the admin sees up to date.
+    func claimProfile(name: String?, email: String?) async throws
     func fetch() async throws -> CloudSnapshot
     func save(state: RemoteState) async throws
     func save(session: RemoteSession) async throws
@@ -28,6 +32,30 @@ final class FirestoreCloudSync: CloudSyncing {
         userDocument = Firestore.firestore().collection("users").document(uid)
     }
 
+    func claimProfile(name: String?, email: String?) async throws {
+        let email = email?.lowercased()
+        var fields: [String: Any] = [:]
+        if let name { fields["name"] = name }
+        if let email { fields["email"] = email }
+
+        let existing = try await userDocument.getDocument()
+        if existing.get("programID") == nil, let email {
+            let invite = try? await Firestore.firestore().collection("invites").document(email).getDocument()
+            if let programID = invite?.get("programID") as? String {
+                fields["programID"] = programID
+                if name == nil, let invitedName = invite?.get("name") as? String {
+                    fields["name"] = invitedName
+                }
+            }
+        }
+        // Only write what actually changed, so a normal launch costs one read.
+        fields = fields.filter { key, value in
+            (existing.get(key) as? String) != (value as? String)
+        }
+        guard !fields.isEmpty else { return }
+        try await userDocument.setData(fields, merge: true)
+    }
+
     func fetch() async throws -> CloudSnapshot {
         try await withThrowingTaskGroup(of: CloudSnapshot.self) { group in
             group.addTask { try await self.load() }
@@ -48,7 +76,8 @@ final class FirestoreCloudSync: CloudSyncing {
             state: stateDocument.data().flatMap(RemoteState.init(fields:)),
             sessions: sessionDocuments.documents.compactMap {
                 RemoteSession(id: $0.documentID, fields: $0.data())
-            }
+            },
+            programID: stateDocument.get("programID") as? String
         )
     }
 

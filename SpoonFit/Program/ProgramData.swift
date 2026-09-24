@@ -36,11 +36,11 @@ enum ProgramData {
     static let warmupSeconds = 45
 
     /// Identical in every session: two minutes of stretching to finish.
-    static let cooldown: [(ref: ExerciseRef, seconds: Int)] = [
-        (ref(.childsPose), 30),
-        (ref(.figureFour), 30),
-        (ref(.quadStretch), 30),
-        (ref(.hamstringStretch), 30)
+    static let cooldown: [CooldownStep] = [
+        CooldownStep(ref: ref(.childsPose), seconds: 30),
+        CooldownStep(ref: ref(.figureFour), seconds: 30),
+        CooldownStep(ref: ref(.quadStretch), seconds: 30),
+        CooldownStep(ref: ref(.hamstringStretch), seconds: 30)
     ]
 
     /// Seconds spent on the "get ready" step before the first warm-up move.

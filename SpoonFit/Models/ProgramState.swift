@@ -11,6 +11,9 @@ final class ProgramState {
     var medicalClearance: Bool
     /// Bumped on every change; the newer side wins when devices disagree.
     var updatedAt: Date = Date.now
+    /// The program variant this account follows. Only the admin (or an
+    /// invite) sets it; the app just reads it from the cloud.
+    var programID: String = ProgramVariant.standard.rawValue
 
     init(
         startDate: Date,

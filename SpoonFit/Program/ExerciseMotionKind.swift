@@ -17,6 +17,8 @@ enum ExerciseMotionKind: String, CaseIterable {
     case wallSit
     case calfRaise
     case quadStretch
+    case hipFlexorStretch
+    case sideStretch
 
     // On the floor
     case sideLegRaise
@@ -35,7 +37,8 @@ enum ExerciseMotionKind: String, CaseIterable {
     var isHorizontal: Bool {
         switch self {
         case .marchInPlace, .gentleSquat, .squat, .sumoSquat, .pulseSquat, .hipCircle,
-             .armSwing, .shortLunge, .lunge, .wallSit, .calfRaise, .quadStretch:
+             .armSwing, .shortLunge, .lunge, .wallSit, .calfRaise, .quadStretch,
+             .hipFlexorStretch, .sideStretch:
             return false
         default:
             return true
@@ -68,6 +71,7 @@ enum ExerciseMotionKind: String, CaseIterable {
         case .pulseSquat: return 0.6
         case .wallSit, .childsPose: return 4.0
         case .hipCircle: return 3.0
+        case .hipFlexorStretch, .sideStretch: return 4.0
         case .marchInPlace: return 1.2
         default: return 2.0
         }

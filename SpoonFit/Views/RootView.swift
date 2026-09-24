@@ -41,8 +41,11 @@ struct RootView: View {
             await openSession(for: auth.user)
         }
         .onChange(of: scenePhase) { _, phase in
-            guard phase == .active, let viewModel = session?.viewModel else { return }
-            Task { await viewModel.synchronize() }
+            guard phase == .active else { return }
+            Task {
+                await auth.refreshUser()
+                await session?.viewModel.synchronize()
+            }
         }
         .onChange(of: LocalizationManager.shared.current) { _, _ in
             session?.viewModel.rescheduleReminderIfNeeded()

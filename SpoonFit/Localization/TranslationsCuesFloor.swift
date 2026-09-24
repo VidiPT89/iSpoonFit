@@ -141,6 +141,36 @@ extension Translations {
             .en: "Keep the supporting foot on the floor instead of lifting the leg."
         ],
 
+        "cue.hipFlexorStretch.steps": [
+            .pt: "Ajoelha-te no tapete com um pé à frente, joelho da frente por cima do tornozelo. Aperta o glúteo da perna de trás e leva a anca devagar para a frente até sentires a frente da anca a alongar. Troca de lado a meio.",
+            .en: "Kneel on the mat with one foot in front, front knee over the ankle. Squeeze the glute of the back leg and ease your hips forward until you feel the front of that hip lengthen. Switch sides halfway."
+        ],
+        "cue.hipFlexorStretch.breathing": [
+            .pt: "Expira enquanto a anca avança, respira calmamente enquanto seguras.",
+            .en: "Exhale as the hips move forward, breathe calmly while you hold."
+        ],
+        "cue.hipFlexorStretch.easier": [
+            .pt: "Põe a toalha dobrada debaixo do joelho de trás e apoia uma mão na cadeira.",
+            .en: "Put the folded towel under the back knee and rest one hand on the chair."
+        ],
+        "cue.hipFlexorStretch.caution": [
+            .pt: "Mantém a barriga ligeiramente ativa e não arqueies a lombar. Se a cicatriz repuxar, avança menos.",
+            .en: "Keep your belly gently engaged and do not arch your lower back. If the scar pulls, move forward less."
+        ],
+
+        "cue.sideStretch.steps": [
+            .pt: "De pé, pés à largura da anca. Leva um braço por cima da cabeça e inclina o tronco suavemente para o lado oposto, sem rodar. Volta ao centro e troca de lado a meio.",
+            .en: "Stand with feet hip-width apart. Reach one arm over your head and bend your torso gently to the opposite side, without twisting. Come back to the centre and switch sides halfway."
+        ],
+        "cue.sideStretch.breathing": [
+            .pt: "Inspira a subir o braço, expira a inclinar.",
+            .en: "Inhale as the arm rises, exhale as you bend."
+        ],
+        "cue.sideStretch.easier": [
+            .pt: "Faz sentada na cadeira, com a outra mão apoiada na coxa.",
+            .en: "Do it sitting on the chair, with the other hand resting on your thigh."
+        ],
+
         "cue.quadStretch.steps": [
             .pt: "Deitada de lado ou em pé com apoio, puxa o pé em direção ao glúteo com os joelhos juntos.",
             .en: "Lying on your side or standing with support, draw your foot towards your glutes with your knees together."

@@ -57,7 +57,7 @@ struct HistoryView: View {
     }
 
     private func row(_ session: CompletedSession) -> some View {
-        let day = ProgramData.day(at: session.dayIndex)
+        let day = viewModel.day(at: session.dayIndex)
         return HStack(alignment: .top, spacing: 13) {
             ZStack {
                 Circle()

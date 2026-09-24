@@ -13,6 +13,12 @@ final class ProgramViewModel {
     private(set) var context: ModelContext?
     /// Nil for a local-only session (tests, or a debug build without Firebase).
     private(set) var sync: CloudSyncing?
+    /// Name and email sent up with the profile, so the admin can tell
+    /// accounts apart.
+    private(set) var profile: (name: String?, email: String?) = (nil, nil)
+    /// A program assigned in the cloud before this account finished
+    /// onboarding; used when the local program is created.
+    var assignedProgramID: String?
     private let calendar = Calendar.current
 
     /// Reset every calendar day, so "low-energy" never silently carries over.
@@ -36,11 +42,20 @@ final class ProgramViewModel {
 
     // MARK: - Loading
 
-    func load(context: ModelContext, sync: CloudSyncing? = nil) {
+    func load(context: ModelContext, sync: CloudSyncing? = nil, name: String? = nil, email: String? = nil) {
         self.context = context
         self.sync = sync
+        profile = (name, email)
         refresh()
     }
+
+    // MARK: - Program variant
+
+    var variant: ProgramVariant { ProgramVariant(id: state?.programID ?? assignedProgramID) }
+
+    func day(at index: Int) -> ProgramDay? { variant.day(at: index) }
+
+    func days(inWeek week: Int) -> [ProgramDay] { variant.days(inWeek: week) }
 
     func refresh() {
         guard let context else { return }
@@ -59,6 +74,7 @@ final class ProgramViewModel {
             reminderEnabled: reminderTime != nil,
             medicalClearance: medicalClearance
         )
+        newState.programID = variant.rawValue
         context.insert(newState)
         try? context.save()
         refresh()
@@ -117,7 +133,7 @@ final class ProgramViewModel {
         (1...ProgramData.totalDays).first { !completedDayIndices.contains($0) }
     }
 
-    var nextDay: ProgramDay? { nextDayIndex.flatMap(ProgramData.day(at:)) }
+    var nextDay: ProgramDay? { nextDayIndex.flatMap(day(at:)) }
 
     /// A day can be started once every earlier day is done.
     func isUnlocked(_ day: ProgramDay) -> Bool {
@@ -134,7 +150,7 @@ final class ProgramViewModel {
     }
 
     func completedDays(inWeek week: Int) -> Int {
-        ProgramData.days(inWeek: week).filter { isCompleted($0) }.count
+        days(inWeek: week).filter { isCompleted($0) }.count
     }
 
     func isWeekComplete(_ week: Int) -> Bool {

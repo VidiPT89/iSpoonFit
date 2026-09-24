@@ -9,10 +9,19 @@ private final class FakeCloud: CloudSyncing {
     var state: RemoteState?
     var sessions: [String: RemoteSession] = [:]
     var isReachable = true
+    var programID: String?
+    var invitedProgramID: String?
+    var profileName: String?
+
+    func claimProfile(name: String?, email: String?) async throws {
+        guard isReachable else { throw URLError(.notConnectedToInternet) }
+        profileName = name ?? profileName
+        if programID == nil { programID = invitedProgramID }
+    }
 
     func fetch() async throws -> CloudSnapshot {
         guard isReachable else { throw URLError(.notConnectedToInternet) }
-        return CloudSnapshot(state: state, sessions: Array(sessions.values))
+        return CloudSnapshot(state: state, sessions: Array(sessions.values), programID: programID)
     }
 
     func save(state: RemoteState) async throws { self.state = state }
@@ -145,6 +154,42 @@ final class CloudSyncTests: XCTestCase {
         await settle()
 
         XCTAssertTrue(cloud.sessions.isEmpty)
+    }
+
+    // MARK: - Assigned program
+
+    func testAnInvitedProgramIsInPlaceBeforeOnboarding() async throws {
+        let cloud = FakeCloud()
+        cloud.invitedProgramID = ProgramVariant.anaChallenge.rawValue
+        let phone = try makeDevice(cloud)
+
+        await phone.synchronize()
+        XCTAssertEqual(phone.variant, .anaChallenge)
+
+        phone.startProgram(startDate: Date(), reminderTime: nil, medicalClearance: true)
+        XCTAssertEqual(phone.state?.programID, ProgramVariant.anaChallenge.rawValue)
+        XCTAssertEqual(phone.day(at: 3)?.cooldown.map(\.ref.exercise), [.childsPose, .hipFlexorStretch])
+    }
+
+    func testTheAdminCanSwitchAProgramLater() async throws {
+        let cloud = FakeCloud()
+        let phone = try makeDevice(cloud)
+        phone.startProgram(startDate: Date(), reminderTime: nil, medicalClearance: true)
+        await phone.synchronize()
+        XCTAssertEqual(phone.variant, .standard)
+
+        cloud.programID = ProgramVariant.anaChallenge.rawValue
+        await phone.synchronize()
+        XCTAssertEqual(phone.variant, .anaChallenge)
+    }
+
+    func testOnlyTheVerifiedAdminEmailIsAdmin() {
+        let admin = AccountUser(uid: "a", name: "David", email: "DaMartins89@gmail.com", providerIDs: ["google.com"], isEmailVerified: true)
+        XCTAssertTrue(admin.isAdmin)
+        let unverified = AccountUser(uid: "a", name: nil, email: AdminPolicy.email, providerIDs: ["password"], isEmailVerified: false)
+        XCTAssertFalse(unverified.isAdmin)
+        let ana = AccountUser(uid: "b", name: "Ana", email: "anacatarinasveiga@gmail.com", providerIDs: ["password"], isEmailVerified: true)
+        XCTAssertFalse(ana.isAdmin)
     }
 
     // MARK: - Records

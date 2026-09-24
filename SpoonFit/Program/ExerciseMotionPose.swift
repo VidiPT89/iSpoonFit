@@ -88,6 +88,8 @@ enum ExerciseMotionPose {
         case .wallSit: return wallSit(p)
         case .calfRaise: return calfRaise(p)
         case .quadStretch: return quadStretch(p)
+        case .hipFlexorStretch: return hipFlexorStretch(p)
+        case .sideStretch: return sideStretch(p)
         case .sideLegRaise: return sideLegRaise(p)
         case .bridge: return bridge(p)
         case .marchingBridge: return marchingBridge(p)
@@ -292,6 +294,46 @@ enum ExerciseMotionPose {
             kneeR: CGPoint(x: 0.455, y: 0.735),
             footR: foot,
             arrows: [MotionArrow(from: CGPoint(x: 0.60, y: 0.86), to: CGPoint(x: 0.56, y: 0.72))]
+        )
+    }
+
+    /// Half-kneeling, seen from the side: the back knee rests on the mat and
+    /// the hips ease forward to open the front of the back hip.
+    static func hipFlexorStretch(_ p: Double) -> StickPose {
+        let shift = 0.045 * motionWave01(p)
+        return StickPose(
+            head: CGPoint(x: 0.47 - shift, y: 0.24),
+            neck: CGPoint(x: 0.47 - shift, y: 0.34),
+            hip: CGPoint(x: 0.51 - shift, y: 0.61),
+            elbowL: CGPoint(x: 0.42 - shift, y: 0.47),
+            handL: CGPoint(x: 0.40 - shift * 0.6, y: 0.61),
+            elbowR: CGPoint(x: 0.54 - shift, y: 0.47),
+            handR: CGPoint(x: 0.51 - shift, y: 0.59),
+            kneeL: CGPoint(x: 0.34 - shift * 0.3, y: 0.66),
+            footL: CGPoint(x: 0.33, y: 0.92),
+            kneeR: CGPoint(x: 0.64 - shift * 0.5, y: 0.915),
+            footR: CGPoint(x: 0.82, y: 0.915),
+            arrows: [MotionArrow(from: CGPoint(x: 0.66, y: 0.52), to: CGPoint(x: 0.56, y: 0.52))]
+        )
+    }
+
+    /// Standing, seen from the front: one arm reaches over the head and the
+    /// torso bends gently towards the other side.
+    static func sideStretch(_ p: Double) -> StickPose {
+        let bend = motionWave01(p)
+        return StickPose(
+            head: CGPoint(x: 0.50 - 0.09 * bend, y: 0.15 + 0.02 * bend),
+            neck: CGPoint(x: 0.50 - 0.055 * bend, y: 0.25 + 0.01 * bend),
+            hip: CGPoint(x: 0.50, y: 0.52),
+            elbowL: CGPoint(x: 0.42 - 0.03 * bend, y: 0.38),
+            handL: CGPoint(x: 0.41 - 0.03 * bend, y: 0.50),
+            elbowR: CGPoint(x: 0.57 - 0.06 * bend, y: 0.16),
+            handR: CGPoint(x: 0.50 - 0.13 * bend, y: 0.07 + 0.03 * bend),
+            kneeL: CGPoint(x: 0.455, y: 0.72),
+            footL: CGPoint(x: 0.45, y: 0.92),
+            kneeR: CGPoint(x: 0.545, y: 0.72),
+            footR: CGPoint(x: 0.55, y: 0.92),
+            arrows: [MotionArrow(from: CGPoint(x: 0.68, y: 0.16), to: CGPoint(x: 0.60, y: 0.09))]
         )
     }
 }

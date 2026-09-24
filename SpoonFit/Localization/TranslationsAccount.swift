@@ -61,6 +61,49 @@ extension Translations {
             .en: "Your account, progress, history and check-ins are deleted for good. This cannot be undone."
         ],
 
+        "auth.emailUnverified": [.pt: "Email por confirmar.", .en: "Email not confirmed yet."],
+        "auth.resend": [.pt: "Reenviar", .en: "Resend"],
+        "auth.verificationSent": [
+            .pt: "Enviámos-te o link de confirmação. Abre-o e volta à app.",
+            .en: "We sent you the confirmation link. Open it and come back to the app."
+        ],
+
+        // MARK: Programs
+        "variant.standard": [.pt: "SpoonFit 28", .en: "SpoonFit 28"],
+        "variant.standard.desc": [
+            .pt: "O programa da app: os mesmos quatro alongamentos, 2 minutos, todos os dias.",
+            .en: "The app's program: the same four stretches, 2 minutes, every day."
+        ],
+        "variant.anaChallenge": [.pt: "Desafio 28 dias da Ana", .en: "Ana's 28-day challenge"],
+        "variant.anaChallenge.desc": [
+            .pt: "Os mesmos treinos, com os alongamentos exatamente como no plano da Ana: dois alongamentos próprios por dia na semana 1 e 30 s por lado a partir do dia 5.",
+            .en: "The same workouts, with the stretches exactly as in Ana's plan: two stretches of its own each day in week 1 and 30 s per side from day 5."
+        ],
+
+        // MARK: Admin
+        "admin.title": [.pt: "Painel de administração", .en: "Admin panel"],
+        "admin.accounts": [.pt: "Contas", .en: "Accounts"],
+        "admin.noAccounts": [.pt: "Ainda ninguém entrou na app.", .en: "Nobody has signed in yet."],
+        "admin.roleAdmin": [.pt: "Admin", .en: "Admin"],
+        "admin.lastWorkout": [.pt: "Último treino: %@", .en: "Last workout: %@"],
+        "admin.noWorkoutsYet": [.pt: "Ainda sem treinos", .en: "No workouts yet"],
+        "admin.startedOn": [.pt: "Começou a %@", .en: "Started on %@"],
+        "admin.notStarted": [.pt: "Ainda não começou o programa", .en: "Has not started the program yet"],
+        "admin.program": [.pt: "Programa", .en: "Program"],
+        "admin.invites": [.pt: "Perfis por ativar", .en: "Pending profiles"],
+        "admin.invitesHint": [
+            .pt: "Quando alguém entrar pela primeira vez com um destes emails, a conta começa já com o programa escolhido.",
+            .en: "When someone first signs in with one of these emails, their account starts on the chosen program."
+        ],
+        "admin.newInvite": [.pt: "Novo perfil", .en: "New profile"],
+        "admin.saveInvite": [.pt: "Guardar perfil", .en: "Save profile"],
+        "admin.deleteInviteTitle": [.pt: "Apagar este perfil?", .en: "Delete this profile?"],
+        "admin.error.load": [
+            .pt: "Não foi possível carregar as contas. Confirma a ligação e o email de admin.",
+            .en: "Could not load the accounts. Check the connection and the admin email."
+        ],
+        "admin.error.save": [.pt: "Não foi possível guardar. Tenta outra vez.", .en: "Could not save. Please try again."],
+
         // MARK: Errors
         "auth.error.nameMissing": [.pt: "Escreve o teu nome.", .en: "Please enter your name."],
         "auth.error.invalidEmail": [.pt: "Esse email não parece válido.", .en: "That email does not look right."],

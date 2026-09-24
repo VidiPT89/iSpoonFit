@@ -30,6 +30,8 @@ extension Translations {
         "stretch.figureFour": [.pt: "Glúteo em figura 4", .en: "Figure-4 glute stretch"],
         "stretch.quad": [.pt: "Quadríceps", .en: "Quad stretch"],
         "stretch.hamstring": [.pt: "Posterior da coxa", .en: "Hamstring stretch"],
+        "stretch.hipFlexor": [.pt: "Flexores da anca", .en: "Hip flexor stretch"],
+        "stretch.side": [.pt: "Lateral do tronco", .en: "Side stretch"],
 
         // MARK: Muscle groups
         "muscle.hipFlexors": [.pt: "Flexores da anca", .en: "Hip flexors"],

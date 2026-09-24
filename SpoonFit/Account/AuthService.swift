@@ -10,6 +10,13 @@ struct AccountUser: Equatable {
     let name: String?
     let email: String?
     let providerIDs: [String]
+    var isEmailVerified = false
+
+    /// Mirrors `isAdmin()` in `firebase/firestore.rules`, which is what
+    /// actually protects the data; this only decides what the app shows.
+    var isAdmin: Bool {
+        isEmailVerified && email?.lowercased() == AdminPolicy.email
+    }
 
     var firstName: String? {
         name?.split(separator: " ").first.map(String.init)
@@ -33,7 +40,8 @@ extension AccountUser {
             uid: user.uid,
             name: user.displayName,
             email: user.email,
-            providerIDs: user.providerData.map(\.providerID)
+            providerIDs: user.providerData.map(\.providerID),
+            isEmailVerified: user.isEmailVerified
         )
     }
 }
@@ -101,6 +109,7 @@ final class AuthService {
             let change = result.user.createProfileChangeRequest()
             change.displayName = name.trimmingCharacters(in: .whitespacesAndNewlines)
             try await change.commitChanges()
+            try? await result.user.sendEmailVerification()
             // The state listener fired before the name was set.
             self.phase = .signedIn(AccountUser(result.user))
         }
@@ -202,6 +211,25 @@ final class AuthService {
     }
 
     // MARK: - Session
+
+    /// Picks up changes made outside the app, such as the email being
+    /// confirmed from the verification link, and refreshes the token the
+    /// database rules read.
+    func refreshUser() async {
+        guard let user = Auth.auth().currentUser else { return }
+        try? await user.reload()
+        _ = try? await user.getIDTokenResult(forcingRefresh: true)
+        if let current = Auth.auth().currentUser {
+            phase = .signedIn(AccountUser(current))
+        }
+    }
+
+    func resendVerification() async {
+        await run {
+            try await Auth.auth().currentUser?.sendEmailVerification()
+            self.noticeKey = "auth.verificationSent"
+        }
+    }
 
     func signOut() {
         guard FirebaseSetup.isConfigured else {

@@ -10,7 +10,7 @@ iSpoonFit needs an account so your programme and progress follow you between dev
 - **Your programme:** start date, reminder settings and your medical-clearance confirmation.
 - **Your workouts:** the day completed, date, duration, whether it was a low-energy day, and the optional check-in (energy, discomfort and a free-text note).
 
-This data is stored with Google Firebase (Authentication and Cloud Firestore) in the European Union (`eur3`). Security rules only let a signed-in user read and write their own data.
+This data is stored with Google Firebase (Authentication and Cloud Firestore) in the European Union (`eur3`). Security rules only let a signed-in user read and write their own data. The one exception is the app's administrator (the developer), who can see each account's name, email, programme and workout history, including check-ins, in order to follow progress and assign the right programme.
 
 ## What stays on your device
 

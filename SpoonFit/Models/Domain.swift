@@ -62,7 +62,7 @@ enum ExerciseID: String, Codable, CaseIterable, Identifiable {
     case marchInPlace, gentleSquat, hipCircles, armSwings
     case sumoSquat, squat, shortLunge, alternatingLunge, wallSit, calfRaise, sideLegRaise
     case gluteBridge, marchingBridge, birdDog, deadBug, heelTaps, pelvicTilt
-    case childsPose, figureFour, quadStretch, hamstringStretch
+    case childsPose, figureFour, quadStretch, hamstringStretch, hipFlexorStretch, sideStretch
 
     var id: String { rawValue }
 
@@ -129,10 +129,20 @@ struct WeekParams: Hashable {
     var phaseDescriptionKey: String { phaseKey + ".desc" }
 }
 
+/// One stretch in the closing block and how long it is held. Unilateral
+/// stretches split the time between both sides.
+struct CooldownStep: Hashable {
+    let ref: ExerciseRef
+    let seconds: Int
+}
+
 struct ProgramDay: Identifiable, Hashable {
     let index: Int
     let titleKey: String
     let exercises: [ExerciseRef]
+    /// The closing stretches. Most days use the standard routine; a program
+    /// can give a day its own.
+    var cooldown: [CooldownStep] = ProgramData.cooldown
 
     var id: Int { index }
 

@@ -10,6 +10,7 @@ struct AccountCard: View {
 
     @State private var confirmsSignOut = false
     @State private var confirmsDeletion = false
+    @State private var showsAdmin = false
 
     let theme = Theme.shared
 
@@ -19,6 +20,34 @@ struct AccountCard: View {
 
             if let user = auth.user {
                 identity(user)
+            }
+
+            if let user = auth.user, user.email != nil, !user.isEmailVerified, user != .localGuest {
+                HStack(spacing: 8) {
+                    Image(systemName: "envelope.badge")
+                        .foregroundStyle(theme.accent)
+                    Text(t("auth.emailUnverified"))
+                        .foregroundStyle(theme.textDim)
+                    Spacer(minLength: 0)
+                    Button(t("auth.resend")) {
+                        Task { await auth.resendVerification() }
+                    }
+                    .foregroundStyle(theme.accent)
+                    .fontWeight(.semibold)
+                }
+                .font(.caption)
+            }
+
+            if let key = auth.noticeKey {
+                Text(t(key))
+                    .font(.caption)
+                    .foregroundStyle(theme.ok)
+            }
+
+            if auth.user?.isAdmin == true {
+                row("admin.title", icon: "shield.lefthalf.filled", tint: theme.text) {
+                    showsAdmin = true
+                }
             }
 
             if let key = auth.errorKey {
@@ -41,6 +70,7 @@ struct AccountCard: View {
         }
         .padding(18)
         .panelBackground()
+        .sheet(isPresented: $showsAdmin) { AdminView() }
         .alert(t("auth.signOutTitle"), isPresented: $confirmsSignOut) {
             Button(t("action.cancel"), role: .cancel) {}
             Button(t("auth.signOut")) { auth.signOut() }

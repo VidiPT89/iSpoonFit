@@ -60,7 +60,7 @@ enum SessionBuilder {
         }
 
         // Stretching, also continuous.
-        for entry in ProgramData.cooldown {
+        for entry in day.cooldown {
             append(.work, .cooldown, entry.ref, entry.seconds)
         }
 

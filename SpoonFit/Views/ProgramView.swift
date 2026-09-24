@@ -12,7 +12,10 @@ struct ProgramView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 18) {
-                    ScreenHeader(titleKey: "tab.program")
+                    ScreenHeader(
+                        titleKey: "tab.program",
+                        subtitle: viewModel.variant == .standard ? nil : t(viewModel.variant.titleKey)
+                    )
                         .padding(.top, 8)
 
                     weekSelector
@@ -113,7 +116,7 @@ struct ProgramView: View {
             }
 
             Button {
-                shareText = SharePayload(text: PlanTextExporter.text(forWeek: selectedWeek))
+                shareText = SharePayload(text: PlanTextExporter.text(forWeek: selectedWeek, variant: viewModel.variant))
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "square.and.arrow.up")
@@ -154,7 +157,7 @@ struct ProgramView: View {
     private var daysList: some View {
         VStack(spacing: 12) {
             SectionHeader(titleKey: "program.days", icon: "list.bullet")
-            ForEach(ProgramData.days(inWeek: selectedWeek)) { day in
+            ForEach(viewModel.days(inWeek: selectedWeek)) { day in
                 dayRow(day)
             }
         }
