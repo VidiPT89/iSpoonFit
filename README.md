@@ -4,6 +4,7 @@
 
 [![Report Bug](https://img.shields.io/badge/Report-Bug-red)](https://github.com/VidiPT89/iSpoonFit/issues)
 [![Request Feature](https://img.shields.io/badge/Request-Feature-blue)](https://github.com/VidiPT89/iSpoonFit/issues)
+[![CI](https://github.com/VidiPT89/iSpoonFit/actions/workflows/ios.yml/badge.svg)](https://github.com/VidiPT89/iSpoonFit/actions/workflows/ios.yml)
 
 ## ✨ Features
 
