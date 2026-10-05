@@ -6,6 +6,10 @@
 [![Request Feature](https://img.shields.io/badge/Request-Feature-blue)](https://github.com/VidiPT89/iSpoonFit/issues)
 [![CI](https://github.com/VidiPT89/iSpoonFit/actions/workflows/ios.yml/badge.svg)](https://github.com/VidiPT89/iSpoonFit/actions/workflows/ios.yml)
 
+<p align="center">
+  <img src="assets/sign-in.jpg" alt="iSpoonFit sign-in screen with email, Apple, Google and Microsoft accounts (shown in Portuguese, the app is bilingual)" width="280">
+</p>
+
 ## ✨ Features
 
 - ✅ Personal accounts: sign up with email and password, or continue with Apple, Google or Microsoft
